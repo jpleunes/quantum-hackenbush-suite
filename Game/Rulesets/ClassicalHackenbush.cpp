@@ -49,8 +49,15 @@ OutcomeClass ClassicalHackenbush::determineOutcomeClass() const {
     std::vector<QuantumHackenbush*> blueOptions = getBlueOptions();
     std::vector<QuantumHackenbush*> redOptions = getRedOptions();
     std::vector<OutcomeClass> blueOutcomes, redOutcomes;
-    for (auto blueOption : blueOptions) blueOutcomes.push_back(blueOption->determineOutcomeClass());
-    for (auto redOption : redOptions) redOutcomes.push_back(redOption->determineOutcomeClass());
+    for (auto blueOption : blueOptions) {
+        blueOutcomes.push_back(blueOption->determineOutcomeClass());
+        delete blueOption;
+    }
+    for (auto redOption : redOptions) {
+        redOutcomes.push_back(redOption->determineOutcomeClass());
+        delete redOption;
+    }
+
 
     for (OutcomeClass blueOutcome : blueOutcomes) {
         if (blueOutcome == OutcomeClass::L || blueOutcome == OutcomeClass::P) {

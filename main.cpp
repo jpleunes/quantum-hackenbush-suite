@@ -35,6 +35,5 @@ int main(int argc, char **argv) {
         default: std::cout << "error" << std::endl;
     }
 
-    // delete start; // TODO: delete remaining dangling pointers, to fix memory leaks
     return 0;
 }

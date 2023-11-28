@@ -1,6 +1,6 @@
-#include "GameUtil.h"
-#include "Game/AdjacencyMatrixPosition.h"
+#include "PositionUtil.h"
 
+// TODO: move everything to ClassicalPostion class?
 AdjacencyMatrixPosition *createRestrictedPosition(int nodeCount, int nBlueHalfs, int nRedHalfs, int nBlueWholes, int nRedWholes) {
     AdjacencyMatrixPosition *classicalPosition = new AdjacencyMatrixPosition(nodeCount);
 

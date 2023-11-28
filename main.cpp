@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Game/Rulesets/ClassicalHackenbush.h"
-#include "GameUtil.h"
+#include "Util/PositionUtil.h"
 
 int main(int argc, char **argv) {
     if (argc < 6) {

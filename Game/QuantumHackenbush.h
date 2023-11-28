@@ -1,5 +1,5 @@
-#ifndef QUANTUMHACKENBUSH_H
-#define QUANTUMHACKENBUSH_H
+#ifndef QUANTUM_HACKENBUSH_H
+#define QUANTUM_HACKENBUSH_H
 
 #include <stdexcept>
 #include <string>
@@ -19,7 +19,7 @@ enum class OutcomeClass {
  */
 class QuantumHackenbush {
 public:
-    QuantumHackenbush(Position *position);
+    QuantumHackenbush(const Position *position);
 
     virtual std::vector<QuantumHackenbush*> getBlueOptions() const = 0;
     virtual std::vector<QuantumHackenbush*> getRedOptions() const = 0;
@@ -28,7 +28,7 @@ public:
     virtual ~QuantumHackenbush() = default;
 
 protected:
-    Position *position;
+    const Position *position;
 };
 
-#endif // QUANTUMHACKENBUSH_H
+#endif // QUANTUM_HACKENBUSH_H

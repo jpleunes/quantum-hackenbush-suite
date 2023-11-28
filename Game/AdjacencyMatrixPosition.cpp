@@ -1,6 +1,6 @@
 #include <queue>
 
-#include "AdjacencyMatrixPosition.h"
+#include "Position.h"
 
 AdjacencyMatrixPosition::AdjacencyMatrixPosition(size_t nodeCount) {
     adjacencyMatrix.resize(nodeCount);
@@ -107,6 +107,25 @@ std::vector<Edge> AdjacencyMatrixPosition::getRedPieces() const {
         }
     }
     return redPieces;
+}
+
+PieceColour AdjacencyMatrixPosition::getPieceColour(Edge piece) const {
+    if (piece.first < piece.second) {
+        return adjacencyMatrix[piece.second][piece.first];
+    }
+    else {
+        return adjacencyMatrix[piece.first][piece.second];
+    }
+}
+
+// TODO: move to Matrix class
+void AdjacencyMatrixPosition::setPieceColour(Edge piece, PieceColour pieceColour) {
+    if (piece.first < piece.second) {
+        adjacencyMatrix[piece.second][piece.first] = pieceColour;
+    }
+    else {
+        adjacencyMatrix[piece.first][piece.second] = pieceColour;
+    }
 }
 
 AdjacencyMatrixPosition::~AdjacencyMatrixPosition() {

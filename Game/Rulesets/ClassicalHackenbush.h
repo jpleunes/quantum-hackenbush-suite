@@ -1,5 +1,5 @@
-#ifndef CLASSICALHACKENBUSH_H
-#define CLASSICALHACKENBUSH_H
+#ifndef CLASSICAL_HACKENBUSH_H
+#define CLASSICAL_HACKENBUSH_H
 
 #include "../QuantumHackenbush.h"
 
@@ -13,4 +13,4 @@ public:
     ~ClassicalHackenbush() override;
 };
 
-#endif // CLASSICALHACKENBUSH_H
+#endif // CLASSICAL_HACKENBUSH_H

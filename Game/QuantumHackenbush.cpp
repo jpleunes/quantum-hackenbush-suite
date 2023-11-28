@@ -1,4 +1,4 @@
 #include "QuantumHackenbush.h"
 
-QuantumHackenbush::QuantumHackenbush(Position *position) : position(position) {
+QuantumHackenbush::QuantumHackenbush(const Position *position) : position(position) {
 }

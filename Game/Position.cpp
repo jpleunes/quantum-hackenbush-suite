@@ -3,10 +3,25 @@
 
 #include "Position.h"
 
-Position::Position(const std::vector<const ClassicalPosition*>& realisations) : realisations(realisations) {
+void Position::addPossiblePieces(const ClassicalPosition* realisation) {
+    size_t nodeCount = realisations[0]->getNodeCount(); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+    for (size_t i = 0; i < nodeCount; i++) {
+        for (size_t j = 0; j < i; j++) {
+            PieceColour pieceColour = realisation->getPieceColour(std::make_pair(i, j));
+            if (pieceColour != PieceColour::NONE) {
+                // TODO: check if existing piece colour matches, error otherwise
+                possiblePieces.setPieceColour(std::make_pair(i,j), pieceColour);
+            }
+        }
+    }
 }
 
-Position::Position(const ClassicalPosition *classicalPosition) : realisations({classicalPosition}) {
+Position::Position(const std::vector<const ClassicalPosition*>& realisations) : realisations(realisations), possiblePieces(realisations[0]->getNodeCount()) { // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+    for (const ClassicalPosition *realisation : realisations) addPossiblePieces(realisation);
+}
+
+Position::Position(const ClassicalPosition *classicalPosition) : realisations({classicalPosition}), possiblePieces(classicalPosition->getNodeCount()) {
+    addPossiblePieces(classicalPosition);
 }
 
 size_t Position::getWidth() const {
@@ -17,8 +32,10 @@ bool Position::empty() const {
     return realisations.empty();
 }
 
-void Position::addRealisation(const ClassicalPosition* realization) {
-    realisations.push_back(realization);
+void Position::addRealisation(const ClassicalPosition* realisation) {
+    realisations.push_back(realisation);
+
+    addPossiblePieces(realisation);
 }
 
 const ClassicalPosition& Position::getRealisation(size_t index) const {
@@ -27,22 +44,12 @@ const ClassicalPosition& Position::getRealisation(size_t index) const {
 
 // Gets the blue pieces across all realisations.
 std::vector<Edge> Position::getBluePieces() const {
-    std::vector<Edge> bluePieces;
-    for (size_t i = 0; i < realisations.size(); i++) {
-        std::vector<Edge> realizationBluePieces = realisations[i]->getBluePieces();
-        bluePieces.insert(bluePieces.end(), realizationBluePieces.begin(), realizationBluePieces.end());
-    }
-    return bluePieces;
+    return possiblePieces.getBluePieces();
 }
 
 // Gets the red pieces across all realisations.
 std::vector<Edge> Position::getRedPieces() const {
-    std::vector<Edge> redPieces;
-    for (size_t i = 0; i < realisations.size(); i++) {
-        std::vector<Edge> realizationRedPieces = realisations[i]->getRedPieces();
-        redPieces.insert(redPieces.end(), realizationRedPieces.begin(), realizationRedPieces.end());
-    }
-    return redPieces;
+    return possiblePieces.getRedPieces();
 }
 
 Position::~Position() {

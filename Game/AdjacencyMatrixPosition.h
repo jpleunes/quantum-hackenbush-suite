@@ -1,7 +1,7 @@
 #ifndef ADJACENCY_MATRIX_POSITION_H
 #define ADJACENCY_MATRIX_POSITION_H
 
-#include "Position.h"
+#include "ClassicalPosition.h"
 
 class AdjacencyMatrixPosition : public ClassicalPosition {
 public:
@@ -10,10 +10,17 @@ public:
     ClassicalPosition* clone() const override;
     size_t getNodeCount() const override;
     void increaseNodeCount(size_t count) override;
-    void addPiece(NodeId from, NodeId to, PieceColour color) override;
-    void removePiece(NodeId from, NodeId to) override;
+    void addPiece(Edge piece, PieceColour colour) override;
+    void removePiece(Edge piece) override;
     std::vector<Edge> getBluePieces() const override;
     std::vector<Edge> getRedPieces() const override;
+    PieceColour getPieceColour(Edge piece) const override;
+    void setPieceColour(Edge piece, PieceColour colour) override;
+    /// @brief Removes all pieces that are no longer connected to the ground.
+    /// @param removedPiece piece that was last removed, can be used to stop the breadth-first search earlier
+    void removeNotConnectedToGround(Edge removedPiece);
+    /// @brief Removes all pieces that are no longer connected to the ground.
+    void removeNotConnectedToGround();
 
     ~AdjacencyMatrixPosition() override;
     

@@ -5,6 +5,7 @@
 
 int main(int argc, char **argv) {
     if (argc < 6) {
+        // TODO: support loading standard format from position file
         std::cout << "Usage: qhs <nBlueHalfs> <nRedHalfs> <nBlueWholes> <nRedWholes> <ruleset>" << std::endl;
         return 1;
     }

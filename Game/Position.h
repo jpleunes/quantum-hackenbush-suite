@@ -2,29 +2,8 @@
 #define POSITION_H
 
 #include <vector>
-#include <cstddef>
 
-typedef size_t NodeId;
-typedef std::pair<NodeId, NodeId> Edge;
-
-enum class PieceColour {
-	BLUE = 1,
-	RED = -1,
-	NONE = 0,
-};
-
-class ClassicalPosition {
-public:
-    virtual ClassicalPosition *clone() const = 0;
-    virtual size_t getNodeCount() const = 0;
-    virtual void increaseNodeCount(size_t count) = 0;
-    virtual void addPiece(NodeId from, NodeId to, PieceColour color) = 0;
-    virtual void removePiece(NodeId from, NodeId to) = 0;
-    virtual std::vector<Edge> getBluePieces() const = 0;
-    virtual std::vector<Edge> getRedPieces() const = 0;
-
-    virtual ~ClassicalPosition() = default;
-};
+#include "AdjacencyMatrixPosition.h"
 
 class Position {
 public:
@@ -32,7 +11,7 @@ public:
     Position(const ClassicalPosition *classicalPosition);
     size_t getWidth() const;
     bool empty() const;
-    void addRealisation(const ClassicalPosition *realization);
+    void addRealisation(const ClassicalPosition *realisation);
     const ClassicalPosition& getRealisation(size_t index) const;
     // Gets the blue pieces across all realisations.
     std::vector<Edge> getBluePieces() const;
@@ -43,6 +22,14 @@ public:
     
 private:
     std::vector<const ClassicalPosition*> realisations;
+    void addPossiblePieces(const ClassicalPosition* realisation);
+    // We use an adjacency matrix position to represent which pieces exist in at least one 
+    // realisation of our position (and can thus be used in a move).
+    // In some cases the AdjacencyMatrixPostion will remove pieces which are no longer connected 
+    // to the ground. 
+    // This is okay, because if a piece does not exist in any realisation, then nothing can exist 
+    // above that piece in any realisation either.
+    AdjacencyMatrixPosition possiblePieces;
 };
 
 // Creates a 1-wide starting position for the restricted variant of Hackenbush.

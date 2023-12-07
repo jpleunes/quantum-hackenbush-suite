@@ -32,57 +32,27 @@ void AdjacencyMatrixPosition::increaseNodeCount(size_t count) {
     }
 }
 
-void AdjacencyMatrixPosition::addPiece(NodeId from, NodeId to, PieceColour color) {
-    if (from < to) {
-        adjacencyMatrix[to][from] = color;
+void AdjacencyMatrixPosition::addPiece(Edge piece, PieceColour colour) {
+    if (piece.first < piece.second) {
+        adjacencyMatrix[piece.second][piece.first] = colour;
     }
     else {
-        adjacencyMatrix[from][to] = color;
+        adjacencyMatrix[piece.first][piece.second] = colour;
     }
     // TODO: check if this piece is connected to ground?
 }
 
-void AdjacencyMatrixPosition::removePiece(NodeId from, NodeId to) {
-    if (from < to) {
-        adjacencyMatrix[to][from] = PieceColour::NONE;
+void AdjacencyMatrixPosition::removePiece(Edge piece) {
+    if (piece.first < piece.second) {
+        adjacencyMatrix[piece.second][piece.first] = PieceColour::NONE;
     }
     else {
-        adjacencyMatrix[from][to] = PieceColour::NONE;
+        adjacencyMatrix[piece.first][piece.second] = PieceColour::NONE;
     }
 
     // Remove all pieces which are no longer connected to ground
+    removeNotConnectedToGround(piece);
     // TODO: remove unreachable nodes by resizing matrix (for this we need node id translations)
-    std::vector<bool> visited(adjacencyMatrix.size(), false);
-    std::queue<NodeId> queue;
-    queue.push(groundId);
-    bool firstVisited = false;
-    bool secondVisited = false;
-    while (!queue.empty()) {
-        NodeId current = queue.front();
-        queue.pop();
-        visited[current] = true;
-        firstVisited |= current == from;
-        secondVisited |= current == to;
-        if (firstVisited && secondVisited) return;
-        for (size_t neighbour = 0; neighbour < adjacencyMatrix.size(); neighbour++) {
-            const PieceColour pieceColour = (current < neighbour) ? adjacencyMatrix[neighbour][current] : adjacencyMatrix[current][neighbour];
-            if (pieceColour != PieceColour::NONE && !visited[neighbour]) {
-                queue.push(neighbour);
-            }
-        }
-    }
-    // Once we have all reachable nodes, we remove all pieces connected to unreachable nodes
-    for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
-        if (visited[i]) continue;
-        for (size_t j = 0; j < adjacencyMatrix.size(); j++) {
-            if (i < j) {
-                adjacencyMatrix[j][i] = PieceColour::NONE;
-            }
-            else {
-                adjacencyMatrix[i][j] = PieceColour::NONE;
-            }
-        }
-    }
 }
 
 std::vector<Edge> AdjacencyMatrixPosition::getBluePieces() const {
@@ -118,7 +88,7 @@ PieceColour AdjacencyMatrixPosition::getPieceColour(Edge piece) const {
     }
 }
 
-// TODO: move to Matrix class
+// TODO: move to Matrix class?
 void AdjacencyMatrixPosition::setPieceColour(Edge piece, PieceColour pieceColour) {
     if (piece.first < piece.second) {
         adjacencyMatrix[piece.second][piece.first] = pieceColour;
@@ -126,6 +96,44 @@ void AdjacencyMatrixPosition::setPieceColour(Edge piece, PieceColour pieceColour
     else {
         adjacencyMatrix[piece.first][piece.second] = pieceColour;
     }
+}
+
+void AdjacencyMatrixPosition::removeNotConnectedToGround(Edge removedPiece) {
+    std::vector<bool> visited(adjacencyMatrix.size(), false);
+    std::queue<NodeId> queue;
+    queue.push(groundId);
+    bool firstVisited = false;
+    bool secondVisited = false;
+    while (!queue.empty()) {
+        NodeId current = queue.front();
+        queue.pop();
+        visited[current] = true;
+        firstVisited |= current == removedPiece.first;
+        secondVisited |= current == removedPiece.second;
+        if (firstVisited && secondVisited) return;
+        for (size_t neighbour = 0; neighbour < adjacencyMatrix.size(); neighbour++) {
+            const PieceColour pieceColour = (current < neighbour) ? adjacencyMatrix[neighbour][current] : adjacencyMatrix[current][neighbour];
+            if (pieceColour != PieceColour::NONE && !visited[neighbour]) {
+                queue.push(neighbour);
+            }
+        }
+    }
+    // Once we have all reachable nodes, we remove all pieces connected to unreachable nodes
+    for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
+        if (visited[i]) continue;
+        for (size_t j = 0; j < adjacencyMatrix.size(); j++) {
+            if (i < j) {
+                adjacencyMatrix[j][i] = PieceColour::NONE;
+            }
+            else {
+                adjacencyMatrix[i][j] = PieceColour::NONE;
+            }
+        }
+    }
+}
+
+void AdjacencyMatrixPosition::removeNotConnectedToGround() {
+    removeNotConnectedToGround(std::make_pair(-1, -1));
 }
 
 AdjacencyMatrixPosition::~AdjacencyMatrixPosition() {

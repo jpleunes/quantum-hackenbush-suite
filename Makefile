@@ -1,6 +1,6 @@
 BUILD_DIR=build
 
-CFLAGS=-Wall -Wextra -Wpedantic -std=c++17
+CFLAGS=-Wall -Wextra -Wpedantic -std=c++17 -O3
 
 TARGET = $(BUILD_DIR)/quantum-hackenbush-suite
 

@@ -8,7 +8,7 @@ std::vector<QuantumHackenbush*> ClassicalHackenbush::getBlueOptions() const {
     std::vector<Edge> bluePieces = position->getBluePieces();
     for (size_t i = 0; i < bluePieces.size(); i++) {
         ClassicalPosition* newPosition = position->getRealisation(0).clone();
-        newPosition->removePiece(bluePieces[i].first, bluePieces[i].second);
+        newPosition->removePiece(bluePieces[i]);
         blueOptions.push_back(new ClassicalHackenbush(newPosition));
     }
     return blueOptions;
@@ -19,7 +19,7 @@ std::vector<QuantumHackenbush*> ClassicalHackenbush::getRedOptions() const {
     std::vector<Edge> redPieces = position->getRedPieces();
     for (size_t i = 0; i < redPieces.size(); i++) {
         ClassicalPosition* newPosition = position->getRealisation(0).clone();
-        newPosition->removePiece(redPieces[i].first, redPieces[i].second);
+        newPosition->removePiece(redPieces[i]);
         redOptions.push_back(new ClassicalHackenbush(newPosition));
     }
     return redOptions;
@@ -48,6 +48,7 @@ OutcomeClass ClassicalHackenbush::determineOutcomeClass() const {
     // We are not in any of the base cases, so we need to use recursion.
     std::vector<QuantumHackenbush*> blueOptions = getBlueOptions();
     std::vector<QuantumHackenbush*> redOptions = getRedOptions();
+    // TODO: count nodes to get an idea of the size of the tree
     std::vector<OutcomeClass> blueOutcomes, redOutcomes;
     for (auto blueOption : blueOptions) {
         blueOutcomes.push_back(blueOption->determineOutcomeClass());

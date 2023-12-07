@@ -1,7 +1,8 @@
 #include <iostream>
 
-#include "Game/Rulesets/ClassicalHackenbush.h"
 #include "Util/PositionUtil.h"
+#include "Game/Rulesets/ClassicalHackenbush.h"
+#include "Game/Rulesets/QuantumHackenbushA.h"
 
 int main(int argc, char **argv) {
     if (argc < 6) {
@@ -17,9 +18,21 @@ int main(int argc, char **argv) {
 
     AdjacencyMatrixPosition *start = createRestrictedPosition(1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes, nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
 
+    QuantumHackenbush* game;
+    Position* position = NULL;
+    if (ruleset == "classical") {
+        game = new ClassicalHackenbush(start);
+    }
+    else if (ruleset == "a") {
+        position = new Position(start);
+        game = new QuantumHackenbushA(position);
+    }
+    else {
+        std::cout << "Unknown ruleset" << std::endl;
+        return 1;
+    }
     std::cout << "Outcome class:" << std::endl;
-    ClassicalHackenbush game(start);
-    switch (game.determineOutcomeClass())
+    switch (game->determineOutcomeClass())
     {
         case OutcomeClass::L:
             std::cout << "L-position" << std::endl;
@@ -36,5 +49,7 @@ int main(int argc, char **argv) {
         default: std::cout << "error" << std::endl;
     }
 
+    delete game;
+    if (position != NULL) delete position;
     return 0;
 }

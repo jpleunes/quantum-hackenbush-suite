@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "PositionUtil.h"
 
 // TODO: move everything to ClassicalPostion class?

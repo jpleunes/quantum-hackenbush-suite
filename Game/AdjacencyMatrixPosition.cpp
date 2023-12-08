@@ -42,17 +42,21 @@ void AdjacencyMatrixPosition::addPiece(Edge piece, PieceColour colour) {
     // TODO: check if this piece is connected to ground?
 }
 
-void AdjacencyMatrixPosition::removePiece(Edge piece) {
+bool AdjacencyMatrixPosition::removePiece(Edge piece) {
+    bool removeSuccessful = false;
     if (piece.first < piece.second) {
+        if (adjacencyMatrix[piece.second][piece.first] == PieceColour::NONE) removeSuccessful = true;
         adjacencyMatrix[piece.second][piece.first] = PieceColour::NONE;
     }
     else {
+        if (adjacencyMatrix[piece.first][piece.second] == PieceColour::NONE) removeSuccessful = true;
         adjacencyMatrix[piece.first][piece.second] = PieceColour::NONE;
     }
 
     // Remove all pieces which are no longer connected to ground
     removeNotConnectedToGround(piece);
     // TODO: remove unreachable nodes by resizing matrix (for this we need node id translations)
+    return removeSuccessful;
 }
 
 std::vector<Edge> AdjacencyMatrixPosition::getBluePieces() const {

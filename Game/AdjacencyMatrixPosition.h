@@ -11,7 +11,7 @@ public:
     size_t getNodeCount() const override;
     void increaseNodeCount(size_t count) override;
     void addPiece(Edge piece, PieceColour colour) override;
-    void removePiece(Edge piece) override;
+    bool removePiece(Edge piece) override;
     std::vector<Edge> getBluePieces() const override;
     std::vector<Edge> getRedPieces() const override;
     PieceColour getPieceColour(Edge piece) const override;

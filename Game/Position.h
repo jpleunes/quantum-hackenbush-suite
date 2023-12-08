@@ -7,7 +7,7 @@
 
 class Position {
 public:
-    Position(const std::vector<const ClassicalPosition*>& realisations);
+    Position(size_t nodeCount);
     Position(const ClassicalPosition *classicalPosition);
     size_t getWidth() const;
     bool empty() const;
@@ -22,7 +22,6 @@ public:
     
 private:
     std::vector<const ClassicalPosition*> realisations;
-    void addPossiblePieces(const ClassicalPosition* realisation);
     // We use an adjacency matrix position to represent which pieces exist in at least one 
     // realisation of our position (and can thus be used in a move).
     // In some cases the AdjacencyMatrixPostion will remove pieces which are no longer connected 
@@ -30,6 +29,8 @@ private:
     // This is okay, because if a piece does not exist in any realisation, then nothing can exist 
     // above that piece in any realisation either.
     AdjacencyMatrixPosition possiblePieces;
+
+    void addPossiblePieces(const ClassicalPosition* realisation);
 };
 
 // Creates a 1-wide starting position for the restricted variant of Hackenbush.

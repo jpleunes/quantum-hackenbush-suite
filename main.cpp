@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     int nRedHalfs = std::stoi(argv[2]);
     int nBlueWholes = std::stoi(argv[3]);
     int nRedWholes = std::stoi(argv[4]);
-    std::string ruleset = argv[5]; // TODO: actually use ruleset
+    std::string ruleset = argv[5];
 
     AdjacencyMatrixPosition *start = createRestrictedPosition(1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes, nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
 

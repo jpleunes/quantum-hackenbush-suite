@@ -16,8 +16,7 @@ void Position::addPossiblePieces(const ClassicalPosition* realisation) {
     }
 }
 
-Position::Position(const std::vector<const ClassicalPosition*>& realisations) : realisations(realisations), possiblePieces(realisations[0]->getNodeCount()) { // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
-    for (const ClassicalPosition *realisation : realisations) addPossiblePieces(realisation);
+Position::Position(size_t nodeCount) : possiblePieces(nodeCount) { // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
 }
 
 Position::Position(const ClassicalPosition *classicalPosition) : realisations({classicalPosition}), possiblePieces(classicalPosition->getNodeCount()) {

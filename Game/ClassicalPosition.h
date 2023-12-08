@@ -19,7 +19,7 @@ public:
     virtual size_t getNodeCount() const = 0;
     virtual void increaseNodeCount(size_t count) = 0;
     virtual void addPiece(Edge piece, PieceColour colour) = 0;
-    virtual void removePiece(Edge piece) = 0;
+    virtual bool removePiece(Edge piece) = 0;
     virtual std::vector<Edge> getBluePieces() const = 0;
     virtual std::vector<Edge> getRedPieces() const = 0;
     virtual PieceColour getPieceColour(Edge piece) const = 0;

@@ -1,8 +1,6 @@
 #ifndef QUANTUM_HACKENBUSH_H
 #define QUANTUM_HACKENBUSH_H
 
-#include <stdexcept>
-#include <string>
 #include <vector>
 
 #include "Position.h"
@@ -21,9 +19,9 @@ class QuantumHackenbush {
 public:
     QuantumHackenbush(const Position *position);
 
-    virtual std::vector<QuantumHackenbush*> getBlueOptions() const = 0;
+    virtual std::vector<QuantumHackenbush*> getBlueOptions() const = 0; // TODO: use IEnumerable with yield for better performance
     virtual std::vector<QuantumHackenbush*> getRedOptions() const = 0;
-    virtual OutcomeClass determineOutcomeClass() const = 0;
+    OutcomeClass determineOutcomeClass() const;
 
     virtual ~QuantumHackenbush() = default;
 

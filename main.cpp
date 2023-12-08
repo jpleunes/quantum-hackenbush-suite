@@ -19,13 +19,11 @@ int main(int argc, char **argv) {
     AdjacencyMatrixPosition *start = createRestrictedPosition(1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes, nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
 
     QuantumHackenbush* game;
-    Position* position = NULL;
     if (ruleset == "classical") {
         game = new ClassicalHackenbush(start);
     }
     else if (ruleset == "a") {
-        position = new Position(start);
-        game = new QuantumHackenbushA(position);
+        game = new QuantumHackenbushA(new Position(start));
     }
     else {
         std::cout << "Unknown ruleset" << std::endl;
@@ -50,6 +48,5 @@ int main(int argc, char **argv) {
     }
 
     delete game;
-    if (position != NULL) delete position;
     return 0;
 }

@@ -8,7 +8,6 @@ public:
     QuantumHackenbushA(Position *position);
     std::vector<QuantumHackenbush*> getBlueOptions() const override;
     std::vector<QuantumHackenbush*> getRedOptions() const override;
-    OutcomeClass determineOutcomeClass() const override;
 
     ~QuantumHackenbushA() override;
 };

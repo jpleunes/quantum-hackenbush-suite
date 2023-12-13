@@ -45,8 +45,8 @@ std::vector<QuantumHackenbush*> QuantumHackenbushA::getBlueOptions() const {
             Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
             for (size_t pieceIndex : combination) {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
-                newRealisation->removePiece(bluePieces[pieceIndex]);
-                option->addRealisation(newRealisation);
+                bool removalSuccessful = newRealisation->removePiece(bluePieces[pieceIndex]);
+                if (removalSuccessful) option->addRealisation(newRealisation);
             }
             blueOptions.push_back(new QuantumHackenbushA(option));
         }

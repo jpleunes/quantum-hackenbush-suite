@@ -21,6 +21,7 @@ public:
     void removeNotConnectedToGround(Edge removedPiece);
     /// @brief Removes all pieces that are no longer connected to the ground.
     void removeNotConnectedToGround();
+    void printHumanReadable() const override;
 
     ~AdjacencyMatrixPosition() override;
     

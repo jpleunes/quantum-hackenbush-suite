@@ -1,4 +1,5 @@
 #include <queue>
+#include <iostream>
 
 #include "Position.h"
 
@@ -45,11 +46,11 @@ void AdjacencyMatrixPosition::addPiece(Edge piece, PieceColour colour) {
 bool AdjacencyMatrixPosition::removePiece(Edge piece) {
     bool removeSuccessful = false;
     if (piece.first < piece.second) {
-        if (adjacencyMatrix[piece.second][piece.first] == PieceColour::NONE) removeSuccessful = true;
+        if (adjacencyMatrix[piece.second][piece.first] != PieceColour::NONE) removeSuccessful = true;
         adjacencyMatrix[piece.second][piece.first] = PieceColour::NONE;
     }
     else {
-        if (adjacencyMatrix[piece.first][piece.second] == PieceColour::NONE) removeSuccessful = true;
+        if (adjacencyMatrix[piece.first][piece.second] != PieceColour::NONE) removeSuccessful = true;
         adjacencyMatrix[piece.first][piece.second] = PieceColour::NONE;
     }
 
@@ -138,6 +139,19 @@ void AdjacencyMatrixPosition::removeNotConnectedToGround(Edge removedPiece) {
 
 void AdjacencyMatrixPosition::removeNotConnectedToGround() {
     removeNotConnectedToGround(std::make_pair(-1, -1));
+}
+
+void AdjacencyMatrixPosition::printHumanReadable() const {
+    std::cout << "===== AdjacencyMatrixPosition =====" << std::endl;
+    for (auto row : adjacencyMatrix) {
+        for (auto pieceColour : row) {
+            if (pieceColour == PieceColour::BLUE) std::cout << "B";
+            else if (pieceColour == PieceColour::RED) std::cout << "R";
+            else if (pieceColour == PieceColour::NONE) std::cout << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "===================================" << std::endl;
 }
 
 AdjacencyMatrixPosition::~AdjacencyMatrixPosition() {

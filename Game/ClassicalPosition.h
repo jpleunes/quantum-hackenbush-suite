@@ -24,6 +24,7 @@ public:
     virtual std::vector<Edge> getRedPieces() const = 0;
     virtual PieceColour getPieceColour(Edge piece) const = 0;
     virtual void setPieceColour(Edge piece, PieceColour colour) = 0;
+    virtual void printHumanReadable() const = 0;
 
     virtual ~ClassicalPosition() = default;
 };

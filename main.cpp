@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
     std::string ruleset = argv[5];
 
     AdjacencyMatrixPosition *start = createRestrictedPosition(1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes, nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
+    start->printHumanReadable();
 
     QuantumHackenbush* game;
     if (ruleset == "classical") {

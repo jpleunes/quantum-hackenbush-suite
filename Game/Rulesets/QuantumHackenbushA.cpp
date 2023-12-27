@@ -40,10 +40,10 @@ std::vector<QuantumHackenbush*> QuantumHackenbushA::getBlueOptions() const {
 
     if (bluePieces.size() < width) return blueOptions;
 
-    for (std::vector<size_t> combination : indexCombinations(bluePieces.size())) {
+    for (std::vector<size_t> move : indexCombinations(bluePieces.size())) {
         for (size_t i = 0; i < position->getWidth(); i++) {
             Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
-            for (size_t pieceIndex : combination) {
+            for (size_t pieceIndex : move) {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
                 bool removalSuccessful = newRealisation->removePiece(bluePieces[pieceIndex]);
                 if (removalSuccessful) option->addRealisation(newRealisation);

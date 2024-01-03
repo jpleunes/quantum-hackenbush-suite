@@ -12,15 +12,12 @@ OutcomeClass QuantumHackenbush::determineOutcomeClass() const { // TODO: count n
     }
 
     // We are not in any of the base cases, so we need to use recursion.
-    std::vector<QuantumHackenbush*> blueOptions = getBlueOptions();
-    std::vector<OutcomeClass> blueOutcomes;
-    for (auto blueOption : blueOptions) {
+    std::vector<OutcomeClass> blueOutcomes, redOutcomes;
+    for (auto blueOption : getBlueOptions()) {
         blueOutcomes.push_back(blueOption->determineOutcomeClass());
         delete blueOption;
     }
-    std::vector<QuantumHackenbush*> redOptions = getRedOptions();
-    std::vector<OutcomeClass> redOutcomes;
-    for (auto redOption : redOptions) {
+    for (auto redOption : getRedOptions()) {
         redOutcomes.push_back(redOption->determineOutcomeClass());
         delete redOption;
     }

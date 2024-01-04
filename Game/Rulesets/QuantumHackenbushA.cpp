@@ -1,5 +1,3 @@
-#include <stack>
-
 #include "QuantumHackenbushA.h"
 
 QuantumHackenbushA::QuantumHackenbushA(Position *position) : QuantumHackenbush(position) {

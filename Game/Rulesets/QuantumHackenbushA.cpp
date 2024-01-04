@@ -2,37 +2,8 @@
 
 #include "QuantumHackenbushA.h"
 
-const int width = 2;
-
 QuantumHackenbushA::QuantumHackenbushA(Position *position) : QuantumHackenbush(position) {
 };
-
-/// @brief TODO
-/// @param n 
-/// @return 
-std::vector<std::vector<size_t>> indexCombinations(size_t n) {
-    std::vector<std::vector<size_t>> result;
-    // This algorithm is a C++ adaptation of https://github.com/blazs/subsets
-    std::vector<size_t> combination(width);
-    int i, j, r;
-
-    for (i = 0; i < width; ++i) combination[i] = i; // Initial combination
-    while (true) {
-        // TODO: improve efficiency by using yield
-        std::vector<size_t> combinationCopy = combination;
-        result.push_back(combinationCopy);
-
-        if (combination[0] == n - width) break;
-
-        for (i = width - 1; i >= 0 && combination[i] + width - i == n; --i);
-        r = combination[i];
-        ++combination[i];
-        j = 2;
-        for (++i; i < width; ++i, ++j) combination[i] = r + j;
-    }
-
-    return result;
-}
 
 std::vector<QuantumHackenbush*> QuantumHackenbushA::getBlueOptions() const {
     std::vector<QuantumHackenbush*> blueOptions;
@@ -50,6 +21,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushA::getBlueOptions() const {
             }
         }
         if (option->getWidth() > 0) blueOptions.push_back(new QuantumHackenbushA(option));
+        else delete option;
     }
     return blueOptions;
 };
@@ -70,6 +42,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushA::getRedOptions() const {
             }
         }
         if (option->getWidth() > 0) redOptions.push_back(new QuantumHackenbushA(option));
+        else delete option;
     }
     return redOptions;
 };

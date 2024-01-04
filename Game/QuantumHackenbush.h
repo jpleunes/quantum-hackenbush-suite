@@ -5,6 +5,8 @@
 
 #include "Position.h"
 
+const int width = 2;
+
 enum class OutcomeClass {
     L,
     R,
@@ -26,6 +28,7 @@ public:
     virtual ~QuantumHackenbush() = default;
 
 protected:
+    std::vector<std::vector<size_t>> indexCombinations(size_t n) const;
     const Position *position;
 };
 

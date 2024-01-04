@@ -52,7 +52,5 @@ std::vector<Edge> Position::getRedPieces() const {
 }
 
 Position::~Position() {
-    for (size_t i = 0; i < realisations.size(); i++) {
-        delete realisations[i];
-    }
+    for (auto realisation : realisations) delete realisation;
 }

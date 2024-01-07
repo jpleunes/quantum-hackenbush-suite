@@ -14,8 +14,8 @@ std::vector<QuantumHackenbush*> QuantumHackenbushA::getBlueOptions() const {
         for (size_t i = 0; i < position->getWidth(); i++) {
             for (size_t pieceIndex : move) {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
-                bool removalSuccessful = newRealisation->removePiece(bluePieces[pieceIndex]);
-                if (removalSuccessful) option->addRealisation(newRealisation);
+                bool valid = newRealisation->removePiece(bluePieces[pieceIndex]);
+                if (valid) option->addRealisation(newRealisation);
             }
         }
         if (option->getWidth() > 0) blueOptions.push_back(new QuantumHackenbushA(option));
@@ -35,8 +35,8 @@ std::vector<QuantumHackenbush*> QuantumHackenbushA::getRedOptions() const {
         for (size_t i = 0; i < position->getWidth(); i++) {
             for (size_t pieceIndex : move) {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
-                bool removalSuccessful = newRealisation->removePiece(redPieces[pieceIndex]);
-                if (removalSuccessful) option->addRealisation(newRealisation);
+                bool valid = newRealisation->removePiece(redPieces[pieceIndex]);
+                if (valid) option->addRealisation(newRealisation);
             }
         }
         if (option->getWidth() > 0) redOptions.push_back(new QuantumHackenbushA(option));

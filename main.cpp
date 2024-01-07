@@ -4,6 +4,7 @@
 #include "Game/Rulesets/ClassicalHackenbush.h"
 #include "Game/Rulesets/QuantumHackenbushA.h"
 #include "Game/Rulesets/QuantumHackenbushB.h"
+#include "Game/Rulesets/QuantumHackenbushC.h"
 
 int main(int argc, char **argv) {
     if (argc < 6) {
@@ -29,6 +30,9 @@ int main(int argc, char **argv) {
     }
     else if (ruleset == "b") {
         game = new QuantumHackenbushB(new Position(start));
+    }
+    else if (ruleset == "c") {
+        game = new QuantumHackenbushC(new Position(start));
     }
     else {
         std::cout << "Unknown ruleset" << std::endl;

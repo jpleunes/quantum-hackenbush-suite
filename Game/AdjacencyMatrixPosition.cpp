@@ -93,7 +93,6 @@ PieceColour AdjacencyMatrixPosition::getPieceColour(Edge piece) const {
     }
 }
 
-// TODO: move to Matrix class?
 void AdjacencyMatrixPosition::setPieceColour(Edge piece, PieceColour pieceColour) {
     if (piece.first < piece.second) {
         adjacencyMatrix[piece.second][piece.first] = pieceColour;

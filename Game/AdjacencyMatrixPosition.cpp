@@ -152,6 +152,3 @@ void AdjacencyMatrixPosition::printHumanReadable() const {
     }
     std::cout << "===================================" << std::endl;
 }
-
-AdjacencyMatrixPosition::~AdjacencyMatrixPosition() {
-}

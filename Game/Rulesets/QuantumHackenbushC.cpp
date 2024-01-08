@@ -15,7 +15,10 @@ std::vector<QuantumHackenbush*> QuantumHackenbushC::getBlueOptions() const {
             ClassicalPosition *newRealisation = position->getRealisation(i).clone();
             bool valid = newRealisation->removePiece(piece);
             if (valid) option->addRealisation(newRealisation);
-            else allValid = false;
+            else {
+                allValid = false;
+                delete newRealisation;
+            }
         }
         if (allValid && option->getWidth() > 0) blueOptions.push_back(new QuantumHackenbushC(option));
         else delete option;
@@ -30,6 +33,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushC::getBlueOptions() const {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
                 bool valid = newRealisation->removePiece(bluePieces[pieceIndex]);
                 if (valid) option->addRealisation(newRealisation);
+                else delete newRealisation;
             }
         }
         if (option->getWidth() > 0) blueOptions.push_back(new QuantumHackenbushC(option));
@@ -50,7 +54,10 @@ std::vector<QuantumHackenbush*> QuantumHackenbushC::getRedOptions() const {
             ClassicalPosition *newRealisation = position->getRealisation(i).clone();
             bool valid = newRealisation->removePiece(piece);
             if (valid) option->addRealisation(newRealisation);
-            else allValid = false;
+            else {
+                allValid = false;
+                delete newRealisation;
+            }
         }
         if (allValid && option->getWidth() > 0) redOptions.push_back(new QuantumHackenbushC(option));
         else delete option;
@@ -65,6 +72,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushC::getRedOptions() const {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
                 bool valid = newRealisation->removePiece(redPieces[pieceIndex]);
                 if (valid) option->addRealisation(newRealisation);
+                else delete newRealisation;
             }
         }
         if (option->getWidth() > 0) redOptions.push_back(new QuantumHackenbushC(option));

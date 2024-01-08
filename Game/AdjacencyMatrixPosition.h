@@ -23,7 +23,7 @@ public:
     void removeNotConnectedToGround();
     void printHumanReadable() const override;
 
-    ~AdjacencyMatrixPosition() override;
+    ~AdjacencyMatrixPosition() override = default;
     
 private:
     std::vector<std::vector<PieceColour>> adjacencyMatrix;

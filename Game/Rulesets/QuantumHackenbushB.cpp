@@ -15,6 +15,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getBlueOptions() const {
             ClassicalPosition *newRealisation = position->getRealisation(i).clone();
             bool valid = newRealisation->removePiece(bluePieces[0]);
             if (valid) option->addRealisation(newRealisation);
+            else delete newRealisation;
         }
         blueOptions.push_back(new QuantumHackenbushB(option));
         return blueOptions;
@@ -29,6 +30,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getBlueOptions() const {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
                 bool valid = newRealisation->removePiece(bluePieces[pieceIndex]);
                 if (valid) option->addRealisation(newRealisation);
+                else delete newRealisation;
             }
         }
         if (option->getWidth() > 0) blueOptions.push_back(new QuantumHackenbushB(option));
@@ -49,6 +51,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getRedOptions() const {
             ClassicalPosition *newRealisation = position->getRealisation(i).clone();
             bool valid = newRealisation->removePiece(redPieces[0]);
             if (valid) option->addRealisation(newRealisation);
+            else delete newRealisation;
         }
         redOptions.push_back(new QuantumHackenbushB(option));
         return redOptions;
@@ -63,6 +66,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getRedOptions() const {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
                 bool valid = newRealisation->removePiece(redPieces[pieceIndex]);
                 if (valid) option->addRealisation(newRealisation);
+                else delete newRealisation;
             }
         }
         if (option->getWidth() > 0) redOptions.push_back(new QuantumHackenbushB(option));

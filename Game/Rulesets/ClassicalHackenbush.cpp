@@ -1,6 +1,6 @@
 #include "ClassicalHackenbush.h"
 
-ClassicalHackenbush::ClassicalHackenbush(const ClassicalPosition* classicalPosition) : QuantumHackenbush(new Position(classicalPosition)) {
+ClassicalHackenbush::ClassicalHackenbush(const Position* position) : QuantumHackenbush(position) {
 };
 
 std::vector<QuantumHackenbush*> ClassicalHackenbush::getBlueOptions() const {
@@ -9,7 +9,7 @@ std::vector<QuantumHackenbush*> ClassicalHackenbush::getBlueOptions() const {
     for (size_t i = 0; i < bluePieces.size(); i++) {
         ClassicalPosition *newPosition = position->getRealisation(0).clone();
         newPosition->removePiece(bluePieces[i]);
-        blueOptions.push_back(new ClassicalHackenbush(newPosition));
+        blueOptions.push_back(new ClassicalHackenbush(new Position(newPosition)));
     }
     return blueOptions;
 };
@@ -20,7 +20,7 @@ std::vector<QuantumHackenbush*> ClassicalHackenbush::getRedOptions() const {
     for (size_t i = 0; i < redPieces.size(); i++) {
         ClassicalPosition *newPosition = position->getRealisation(0).clone();
         newPosition->removePiece(redPieces[i]);
-        redOptions.push_back(new ClassicalHackenbush(newPosition));
+        redOptions.push_back(new ClassicalHackenbush(new Position(newPosition)));
     }
     return redOptions;
 };

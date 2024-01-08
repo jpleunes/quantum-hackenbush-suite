@@ -5,7 +5,7 @@
 
 class QuantumHackenbushB : public QuantumHackenbush {
 public:
-    QuantumHackenbushB(Position *position);
+    QuantumHackenbushB(const Position *position);
     std::vector<QuantumHackenbush*> getBlueOptions() const override;
     std::vector<QuantumHackenbush*> getRedOptions() const override;
 

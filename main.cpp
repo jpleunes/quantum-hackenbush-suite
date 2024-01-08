@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 
     QuantumHackenbush* game;
     if (ruleset == "classical") {
-        game = new ClassicalHackenbush(start);
+        game = new ClassicalHackenbush(new Position(start));
     }
     else if (ruleset == "a") {
         game = new QuantumHackenbushA(new Position(start));

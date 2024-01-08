@@ -40,30 +40,3 @@ OutcomeClass QuantumHackenbush::determineOutcomeClass() const { // TODO: count n
     }
     return OutcomeClass::P;
 };
-
-/// @brief TODO
-/// @param n 
-/// @return 
-std::vector<std::vector<size_t>> QuantumHackenbush::indexCombinations(size_t n) const {
-    std::vector<std::vector<size_t>> result;
-    // This algorithm is a C++ adaptation of https://github.com/blazs/subsets
-    std::vector<size_t> combination(width);
-    int i, j, r;
-
-    for (i = 0; i < width; ++i) combination[i] = i; // Initial combination
-    while (true) {
-        // TODO: improve efficiency by using yield
-        std::vector<size_t> combinationCopy = combination;
-        result.push_back(combinationCopy);
-
-        if (combination[0] == n - width) break;
-
-        for (i = width - 1; i >= 0 && combination[i] + width - i == n; --i);
-        r = combination[i];
-        ++combination[i];
-        j = 2;
-        for (++i; i < width; ++i, ++j) combination[i] = r + j;
-    }
-
-    return result;
-}

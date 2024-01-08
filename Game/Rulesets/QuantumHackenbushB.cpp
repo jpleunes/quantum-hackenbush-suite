@@ -1,6 +1,6 @@
 #include "QuantumHackenbushB.h"
 
-QuantumHackenbushB::QuantumHackenbushB(Position *position) : QuantumHackenbush(position) {
+QuantumHackenbushB::QuantumHackenbushB(const Position *position) : QuantumHackenbush(position) {
 };
 
 std::vector<QuantumHackenbush*> QuantumHackenbushB::getBlueOptions() const {
@@ -21,21 +21,9 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getBlueOptions() const {
         return blueOptions;
     }
 
-    if (bluePieces.size() < width) return blueOptions;
+    auto blueSuperposedMoveOptions = getBlueSuperposedMoveOptions<QuantumHackenbushB>(bluePieces);
+    blueOptions.insert(blueOptions.end(), blueSuperposedMoveOptions.begin(), blueSuperposedMoveOptions.end());
 
-    for (std::vector<size_t> move : indexCombinations(bluePieces.size())) {
-        Position *option = new Position();
-        for (size_t i = 0; i < position->getWidth(); i++) {
-            for (size_t pieceIndex : move) {
-                ClassicalPosition *newRealisation = position->getRealisation(i).clone();
-                bool valid = newRealisation->removePiece(bluePieces[pieceIndex]);
-                if (valid) option->addRealisation(newRealisation);
-                else delete newRealisation;
-            }
-        }
-        if (option->getWidth() > 0) blueOptions.push_back(new QuantumHackenbushB(option));
-        else delete option;
-    }
     return blueOptions;
 };
 
@@ -57,21 +45,9 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getRedOptions() const {
         return redOptions;
     }
 
-    if (redPieces.size() < width) return redOptions;
+    auto redSuperposedMoveOptions = getRedSuperposedMoveOptions<QuantumHackenbushB>(redPieces);
+    redOptions.insert(redOptions.end(), redSuperposedMoveOptions.begin(), redSuperposedMoveOptions.end());
 
-    for (std::vector<size_t> move : indexCombinations(redPieces.size())) {
-        Position *option = new Position();
-        for (size_t i = 0; i < position->getWidth(); i++) {
-            for (size_t pieceIndex : move) {
-                ClassicalPosition *newRealisation = position->getRealisation(i).clone();
-                bool valid = newRealisation->removePiece(redPieces[pieceIndex]);
-                if (valid) option->addRealisation(newRealisation);
-                else delete newRealisation;
-            }
-        }
-        if (option->getWidth() > 0) redOptions.push_back(new QuantumHackenbushB(option));
-        else delete option;
-    }
     return redOptions;
 };
 

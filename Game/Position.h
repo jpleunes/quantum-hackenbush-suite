@@ -28,7 +28,7 @@ private:
     // to the ground. 
     // This is okay, because if a piece does not exist in any realisation, then nothing can exist 
     // above that piece in any realisation either.
-    AdjacencyMatrixPosition *possiblePieces;
+    AdjacencyMatrixPosition *possiblePieces = nullptr;
 
     void addPossiblePieces(const ClassicalPosition* realisation);
 };

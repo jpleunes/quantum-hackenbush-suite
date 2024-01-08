@@ -10,7 +10,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getBlueOptions() const {
     // Ruleset B: if a player has only one possible move within all realisations together, 
     // he can play it as an unsuperposed move
     if (bluePieces.size() == 1) {
-        Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+        Position *option = new Position();
         for (size_t i = 0; i < position->getWidth(); i++) {
             ClassicalPosition *newRealisation = position->getRealisation(i).clone();
             bool valid = newRealisation->removePiece(bluePieces[0]);
@@ -23,7 +23,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getBlueOptions() const {
     if (bluePieces.size() < width) return blueOptions;
 
     for (std::vector<size_t> move : indexCombinations(bluePieces.size())) {
-        Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+        Position *option = new Position();
         for (size_t i = 0; i < position->getWidth(); i++) {
             for (size_t pieceIndex : move) {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
@@ -44,7 +44,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getRedOptions() const {
     // Ruleset B: if a player has only one possible move within all realisations together, 
     // he can play it as an unsuperposed move
     if (redPieces.size() == 1) {
-        Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+        Position *option = new Position();
         for (size_t i = 0; i < position->getWidth(); i++) {
             ClassicalPosition *newRealisation = position->getRealisation(i).clone();
             bool valid = newRealisation->removePiece(redPieces[0]);
@@ -57,7 +57,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getRedOptions() const {
     if (redPieces.size() < width) return redOptions;
 
     for (std::vector<size_t> move : indexCombinations(redPieces.size())) {
-        Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+        Position *option = new Position();
         for (size_t i = 0; i < position->getWidth(); i++) {
             for (size_t pieceIndex : move) {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();

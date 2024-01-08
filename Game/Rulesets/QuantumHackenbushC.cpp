@@ -9,7 +9,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushC::getBlueOptions() const {
 
     // Ruleset C: unsuperposed moves are allowed if and only if they are valid in all possible realisations
     for (Edge piece : bluePieces) {
-        Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+        Position *option = new Position();
         bool allValid = true;
         for (size_t i = 0; i < position->getWidth(); i++) {
             ClassicalPosition *newRealisation = position->getRealisation(i).clone();
@@ -24,7 +24,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushC::getBlueOptions() const {
     if (bluePieces.size() < width) return blueOptions;
 
     for (std::vector<size_t> move : indexCombinations(bluePieces.size())) {
-        Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+        Position *option = new Position();
         for (size_t i = 0; i < position->getWidth(); i++) {
             for (size_t pieceIndex : move) {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();
@@ -44,7 +44,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushC::getRedOptions() const {
 
     // Ruleset C: unsuperposed moves are allowed if and only if they are valid in all possible realisations
     for (Edge piece : redPieces) {
-        Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+        Position *option = new Position();
         bool allValid = true;
         for (size_t i = 0; i < position->getWidth(); i++) {
             ClassicalPosition *newRealisation = position->getRealisation(i).clone();
@@ -59,7 +59,7 @@ std::vector<QuantumHackenbush*> QuantumHackenbushC::getRedOptions() const {
     if (redPieces.size() < width) return redOptions;
 
     for (std::vector<size_t> move : indexCombinations(redPieces.size())) {
-        Position *option = new Position(position->getRealisation(0).getNodeCount()); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
+        Position *option = new Position();
         for (size_t i = 0; i < position->getWidth(); i++) {
             for (size_t pieceIndex : move) {
                 ClassicalPosition *newRealisation = position->getRealisation(i).clone();

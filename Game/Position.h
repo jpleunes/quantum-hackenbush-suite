@@ -7,7 +7,7 @@
 
 class Position {
 public:
-    Position(size_t nodeCount);
+    Position();
     Position(const ClassicalPosition *classicalPosition);
     size_t getWidth() const;
     bool empty() const;
@@ -28,7 +28,7 @@ private:
     // to the ground. 
     // This is okay, because if a piece does not exist in any realisation, then nothing can exist 
     // above that piece in any realisation either.
-    AdjacencyMatrixPosition possiblePieces;
+    AdjacencyMatrixPosition *possiblePieces;
 
     void addPossiblePieces(const ClassicalPosition* realisation);
 };

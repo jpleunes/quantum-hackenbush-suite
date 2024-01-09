@@ -13,6 +13,11 @@ enum class PieceColour {
 	NONE = (char) 0,
 };
 
+enum class Player {
+    LEFT = (char) 1,
+    RIGHT = (char) -1,
+};
+
 class ClassicalPosition {
 public:
     virtual ClassicalPosition *clone() const = 0;
@@ -20,8 +25,7 @@ public:
     virtual void increaseNodeCount(size_t count) = 0;
     virtual void addPiece(Edge piece, PieceColour colour) = 0;
     virtual bool removePiece(Edge piece) = 0;
-    virtual std::vector<Edge> getBluePieces() const = 0;
-    virtual std::vector<Edge> getRedPieces() const = 0;
+    virtual std::vector<Edge> getPieces(PieceColour colour) const = 0;
     virtual PieceColour getPieceColour(Edge piece) const = 0;
     virtual void setPieceColour(Edge piece, PieceColour colour) = 0;
     virtual void printHumanReadable() const = 0;

@@ -12,8 +12,7 @@ public:
     void increaseNodeCount(size_t count) override;
     void addPiece(Edge piece, PieceColour colour) override;
     bool removePiece(Edge piece) override;
-    std::vector<Edge> getBluePieces() const override;
-    std::vector<Edge> getRedPieces() const override;
+    std::vector<Edge> getPieces(PieceColour colour) const override;
     PieceColour getPieceColour(Edge piece) const override;
     void setPieceColour(Edge piece, PieceColour colour) override;
     /// @brief Removes all pieces that are no longer connected to the ground.

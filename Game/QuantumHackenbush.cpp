@@ -12,29 +12,29 @@ OutcomeClass QuantumHackenbush::determineOutcomeClass() const { // TODO: count n
     }
 
     // We are not in any of the base cases, so we need to use recursion.
-    std::vector<OutcomeClass> blueOutcomes, redOutcomes;
-    for (auto blueOption : getBlueOptions()) {
-        blueOutcomes.push_back(blueOption->determineOutcomeClass());
-        delete blueOption;
+    std::vector<OutcomeClass> leftOutcomes, rightOutcomes;
+    for (auto leftOption : getOptions(Player::LEFT)) {
+        leftOutcomes.push_back(leftOption->determineOutcomeClass());
+        delete leftOption;
     }
-    for (auto redOption : getRedOptions()) {
-        redOutcomes.push_back(redOption->determineOutcomeClass());
-        delete redOption;
+    for (auto rightOption : getOptions(Player::RIGHT)) {
+        rightOutcomes.push_back(rightOption->determineOutcomeClass());
+        delete rightOption;
     }
 
     // TODO: possible improvement: only calculate outcome when needed
-    for (OutcomeClass blueOutcome : blueOutcomes) {
-        if (blueOutcome == OutcomeClass::L || blueOutcome == OutcomeClass::P) {
-            for (OutcomeClass redOutcome : redOutcomes) {
-                if (redOutcome == OutcomeClass::R || redOutcome == OutcomeClass::P) {
+    for (OutcomeClass leftOutcome : leftOutcomes) {
+        if (leftOutcome == OutcomeClass::L || leftOutcome == OutcomeClass::P) {
+            for (OutcomeClass rightOutcome : rightOutcomes) {
+                if (rightOutcome == OutcomeClass::R || rightOutcome == OutcomeClass::P) {
                     return OutcomeClass::N;
                 }
             }
             return OutcomeClass::L;
         }
     }
-    for (OutcomeClass redOutcome : redOutcomes) {
-        if (redOutcome == OutcomeClass::R || redOutcome == OutcomeClass::P) {
+    for (OutcomeClass rightOutcome : rightOutcomes) {
+        if (rightOutcome == OutcomeClass::R || rightOutcome == OutcomeClass::P) {
             return OutcomeClass::R;
         }
     }

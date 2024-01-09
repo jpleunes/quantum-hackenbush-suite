@@ -6,8 +6,7 @@
 class QuantumHackenbushD : public QuantumHackenbush {
 public:
     QuantumHackenbushD(const Position *position);
-    std::vector<QuantumHackenbush*> getBlueOptions() const override;
-    std::vector<QuantumHackenbush*> getRedOptions() const override;
+    std::vector<QuantumHackenbush*> getOptions(Player player) const override;
 
     ~QuantumHackenbushD() override;
 };

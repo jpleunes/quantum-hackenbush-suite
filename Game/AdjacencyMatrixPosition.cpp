@@ -60,28 +60,16 @@ bool AdjacencyMatrixPosition::removePiece(Edge piece) {
     return removeSuccessful;
 }
 
-std::vector<Edge> AdjacencyMatrixPosition::getBluePieces() const {
-    std::vector<Edge> bluePieces;
+std::vector<Edge> AdjacencyMatrixPosition::getPieces(PieceColour colour) const {
+    std::vector<Edge> pieces;
     for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
         for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {
-            if (adjacencyMatrix[i][j] == PieceColour::BLUE) {
-                bluePieces.push_back(std::make_pair(i, j));
+            if (adjacencyMatrix[i][j] == colour) {
+                pieces.push_back(std::make_pair(i, j));
             }
         }
     }
-    return bluePieces;
-}
-
-std::vector<Edge> AdjacencyMatrixPosition::getRedPieces() const {
-    std::vector<Edge> redPieces;
-    for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
-        for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {
-            if (adjacencyMatrix[i][j] == PieceColour::RED) {
-                redPieces.push_back(std::make_pair(i, j));
-            }
-        }
-    }
-    return redPieces;
+    return pieces;
 }
 
 PieceColour AdjacencyMatrixPosition::getPieceColour(Edge piece) const {
@@ -93,12 +81,12 @@ PieceColour AdjacencyMatrixPosition::getPieceColour(Edge piece) const {
     }
 }
 
-void AdjacencyMatrixPosition::setPieceColour(Edge piece, PieceColour pieceColour) {
+void AdjacencyMatrixPosition::setPieceColour(Edge piece, PieceColour colour) {
     if (piece.first < piece.second) {
-        adjacencyMatrix[piece.second][piece.first] = pieceColour;
+        adjacencyMatrix[piece.second][piece.first] = colour;
     }
     else {
-        adjacencyMatrix[piece.first][piece.second] = pieceColour;
+        adjacencyMatrix[piece.first][piece.second] = colour;
     }
 }
 

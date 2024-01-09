@@ -21,55 +21,32 @@ class QuantumHackenbush {
 public:
     QuantumHackenbush(const Position *position);
 
-    virtual std::vector<QuantumHackenbush*> getBlueOptions() const = 0; // TODO: use IEnumerable with yield for better performance
-    virtual std::vector<QuantumHackenbush*> getRedOptions() const = 0;
+    virtual std::vector<QuantumHackenbush*> getOptions(Player player) const = 0; // TODO: use IEnumerable with yield for better performance
     OutcomeClass determineOutcomeClass() const;
 
     virtual ~QuantumHackenbush() = default;
 
 protected:
     template<typename Ruleset>
-    std::vector<Ruleset*> getBlueSuperposedMoveOptions(const std::vector<Edge> &bluePieces) const {
-        std::vector<Ruleset*> blueOptions;
+    std::vector<Ruleset*> getSuperposedMoveOptions(const std::vector<Edge> &pieces) const { // TODO: also allow moves with width >2
+        std::vector<Ruleset*> options;
 
-        if (bluePieces.size() < width) return blueOptions;
-        for (std::vector<size_t> move : indexCombinations(bluePieces.size())) {
+        if (pieces.size() < width) return options;
+        for (std::vector<size_t> move : indexCombinations(pieces.size())) {
             Position *option = new Position();
             for (size_t i = 0; i < position->getWidth(); i++) {
                 for (size_t pieceIndex : move) {
                     ClassicalPosition *newRealisation = position->getRealisation(i).clone();
-                    bool valid = newRealisation->removePiece(bluePieces[pieceIndex]);
+                    bool valid = newRealisation->removePiece(pieces[pieceIndex]);
                     if (valid) option->addRealisation(newRealisation);
                     else delete newRealisation;
                 }
             }
-            if (option->getWidth() > 0) blueOptions.push_back(new Ruleset(option));
+            if (option->getWidth() > 0) options.push_back(new Ruleset(option));
             else delete option;
         }
 
-        return blueOptions;
-    }
-
-    template<typename Ruleset>
-    std::vector<Ruleset*> getRedSuperposedMoveOptions(const std::vector<Edge> &redPieces) const {
-        std::vector<Ruleset*> redOptions;
-
-        if (redPieces.size() < width) return redOptions;
-        for (std::vector<size_t> move : indexCombinations(redPieces.size())) {
-            Position *option = new Position();
-            for (size_t i = 0; i < position->getWidth(); i++) {
-                for (size_t pieceIndex : move) {
-                    ClassicalPosition *newRealisation = position->getRealisation(i).clone();
-                    bool valid = newRealisation->removePiece(redPieces[pieceIndex]);
-                    if (valid) option->addRealisation(newRealisation);
-                    else delete newRealisation;
-                }
-            }
-            if (option->getWidth() > 0) redOptions.push_back(new Ruleset(option));
-            else delete option;
-        }
-
-        return redOptions;
+        return options;
     }
 
     const Position *position;

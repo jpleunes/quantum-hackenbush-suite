@@ -44,14 +44,16 @@ const ClassicalPosition& Position::getRealisation(size_t index) const {
     return *(realisations[index]);
 }
 
-// Gets the blue pieces across all realisations.
-std::vector<Edge> Position::getBluePieces() const {
-    return possiblePieces->getBluePieces();
-}
-
-// Gets the red pieces across all realisations.
-std::vector<Edge> Position::getRedPieces() const {
-    return possiblePieces->getRedPieces();
+// Gets the pieces for a given player across all realisations.
+std::vector<Edge> Position::getPieces(Player player) const {
+    switch (player) {
+        case Player::LEFT:
+            return possiblePieces->getPieces(PieceColour::BLUE);
+        case Player::RIGHT:
+            return possiblePieces->getPieces(PieceColour::RED);
+        default:
+            throw(std::domain_error("Unknown player case"));
+    }
 }
 
 Position::~Position() {

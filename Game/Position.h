@@ -13,10 +13,8 @@ public:
     bool empty() const;
     void addRealisation(const ClassicalPosition *realisation);
     const ClassicalPosition& getRealisation(size_t index) const;
-    // Gets the blue pieces across all realisations.
-    std::vector<Edge> getBluePieces() const;
-    // Gets the red pieces across all realisations.
-    std::vector<Edge> getRedPieces() const;
+    // Gets the pieces for a given player across all realisations.
+    std::vector<Edge> getPieces(Player player) const;
 
     ~Position();
     

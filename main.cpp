@@ -5,6 +5,7 @@
 #include "Game/Rulesets/QuantumHackenbushA.h"
 #include "Game/Rulesets/QuantumHackenbushB.h"
 #include "Game/Rulesets/QuantumHackenbushC.h"
+#include "Game/Rulesets/QuantumHackenbushCPrime.h"
 #include "Game/Rulesets/QuantumHackenbushD.h"
 
 int main(int argc, char **argv) {
@@ -34,6 +35,9 @@ int main(int argc, char **argv) {
     }
     else if (ruleset == "c") {
         game = new QuantumHackenbushC(new Position(start));
+    }
+    else if (ruleset == "cprime") {
+        game = new QuantumHackenbushCPrime(new Position(start));
     }
     else if (ruleset == "d") {
         game = new QuantumHackenbushD(new Position(start));

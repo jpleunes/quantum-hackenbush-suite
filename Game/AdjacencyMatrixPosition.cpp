@@ -60,7 +60,19 @@ bool AdjacencyMatrixPosition::removePiece(Edge piece) {
     return removeSuccessful;
 }
 
-std::vector<Edge> AdjacencyMatrixPosition::getPieces(PieceColour colour) const {
+std::vector<Edge> AdjacencyMatrixPosition::getPieces(Player player) const {
+    PieceColour colour;
+    switch (player) {
+        case Player::LEFT:
+            colour = PieceColour::BLUE;
+            break;
+        case Player::RIGHT:
+            colour = PieceColour::RED;
+            break;
+        default:
+            throw(std::domain_error("Unknown player case"));
+    }
+
     std::vector<Edge> pieces;
     for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
         for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {

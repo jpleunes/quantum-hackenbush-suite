@@ -1,5 +1,5 @@
-#ifndef QUANTUM_HACKENBUSHC_H
-#define QUANTUM_HACKENBUSHC_H
+#ifndef QUANTUM_HACKENBUSH_C_H
+#define QUANTUM_HACKENBUSH_C_H
 
 #include "../QuantumHackenbush.h"
 
@@ -11,4 +11,4 @@ public:
     ~QuantumHackenbushC() override;
 };
 
-#endif // QUANTUM_HACKENBUSHC_H
+#endif // QUANTUM_HACKENBUSH_C_H

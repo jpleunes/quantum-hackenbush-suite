@@ -25,7 +25,7 @@ public:
     virtual void increaseNodeCount(size_t count) = 0;
     virtual void addPiece(Edge piece, PieceColour colour) = 0;
     virtual bool removePiece(Edge piece) = 0;
-    virtual std::vector<Edge> getPieces(PieceColour colour) const = 0;
+    virtual std::vector<Edge> getPieces(Player player) const = 0;
     virtual PieceColour getPieceColour(Edge piece) const = 0;
     virtual void setPieceColour(Edge piece, PieceColour colour) = 0;
     virtual void printHumanReadable() const = 0;

@@ -17,29 +17,23 @@ OutcomeClass QuantumHackenbush::determineOutcomeClass() const {
 }
 
 OutcomeClass QuantumHackenbush::determineOutcomeClass(Player turn) const {
-    std::vector<QuantumHackenbush*> options = getOptions(turn);
+    Generator<QuantumHackenbush*> optionsGen = options(turn);
     switch (turn) {
         case Player::LEFT:
-            for (QuantumHackenbush *option : options) {
+            while (optionsGen) {
+                QuantumHackenbush *option = optionsGen();
                 OutcomeClass outcome = option->determineOutcomeClass(Player::RIGHT);
-                if (outcome == OutcomeClass::L || outcome == OutcomeClass::P) {
-                    for (QuantumHackenbush *o : options) delete o;
-                    return OutcomeClass::L;
-                }
+                delete option;
+                if (outcome == OutcomeClass::L || outcome == OutcomeClass::P) return OutcomeClass::L;
             }
-
-            for (QuantumHackenbush *o : options) delete o;
             return OutcomeClass::R;
         case Player::RIGHT:
-            for (QuantumHackenbush *option : options) {
+            while (optionsGen) {
+                QuantumHackenbush *option = optionsGen();
                 OutcomeClass outcome = option->determineOutcomeClass(Player::LEFT);
-                if (outcome == OutcomeClass::R || outcome == OutcomeClass::P) {
-                    for (QuantumHackenbush *o : options) delete o;
-                    return OutcomeClass::R;
-                }
+                delete option;
+                if (outcome == OutcomeClass::R || outcome == OutcomeClass::P) return OutcomeClass::R;
             }
-
-            for (QuantumHackenbush *o : options) delete o;
             return OutcomeClass::L;
         default:
             throw(std::domain_error("Unknown player case"));

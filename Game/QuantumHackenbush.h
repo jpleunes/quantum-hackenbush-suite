@@ -2,6 +2,7 @@
 #define QUANTUM_HACKENBUSH_H
 
 #include "Position.h"
+#include "../Util/Generator.h"
 
 const int width = 2;
 
@@ -19,17 +20,15 @@ class QuantumHackenbush {
 public:
     QuantumHackenbush(const Position *position);
 
-    virtual std::vector<QuantumHackenbush*> getOptions(Player player) const = 0; // TODO: use IEnumerable with yield for better performance
+    virtual Generator<QuantumHackenbush*> options(Player player) const = 0;
     OutcomeClass determineOutcomeClass() const;
 
     virtual ~QuantumHackenbush() = default;
 
 protected:
     template<typename Ruleset>
-    std::vector<Ruleset*> getSuperposedMoveOptions(const std::vector<Edge> &pieces) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
-        std::vector<Ruleset*> options;
-
-        if (pieces.size() < width) return options;
+    Generator<Ruleset*> superposedMoveOptions(const std::vector<Edge> &pieces) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
+        if (pieces.size() < width) co_return;
         for (std::vector<size_t> move : indexCombinations(pieces.size())) {
             Position *option = new Position();
             for (size_t i = 0; i < position->getWidth(); i++) {
@@ -40,11 +39,9 @@ protected:
                     else delete newRealisation;
                 }
             }
-            if (option->getWidth() > 0) options.push_back(new Ruleset(option));
+            if (option->getWidth() > 0) co_yield new Ruleset(option);
             else delete option;
         }
-
-        return options;
     }
 
     const Position *position;

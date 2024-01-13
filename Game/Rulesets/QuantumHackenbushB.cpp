@@ -3,8 +3,7 @@
 QuantumHackenbushB::QuantumHackenbushB(const Position *position) : QuantumHackenbush(position) {
 };
 
-std::vector<QuantumHackenbush*> QuantumHackenbushB::getOptions(Player player) const {
-    std::vector<QuantumHackenbush*> options;
+Generator<QuantumHackenbush*> QuantumHackenbushB::options(Player player) const {
     std::vector<Edge> pieces = position->getPieces(player);
 
     // Ruleset B: if a player has only one possible move within all realisations together, 
@@ -17,14 +16,12 @@ std::vector<QuantumHackenbush*> QuantumHackenbushB::getOptions(Player player) co
             if (valid) option->addRealisation(newRealisation);
             else delete newRealisation;
         }
-        options.push_back(new QuantumHackenbushB(option));
-        return options;
+        co_yield new QuantumHackenbushB(option);
+        co_return;
     }
 
-    auto superposedMoveOptions = getSuperposedMoveOptions<QuantumHackenbushB>(pieces);
-    options.insert(options.end(), superposedMoveOptions.begin(), superposedMoveOptions.end());
-
-    return options;
+    auto superposedMoveOptionsGen = superposedMoveOptions<QuantumHackenbushB>(pieces);
+    while (superposedMoveOptionsGen) co_yield superposedMoveOptionsGen();
 };
 
 QuantumHackenbushB::~QuantumHackenbushB() {

@@ -3,8 +3,7 @@
 QuantumHackenbushCPrime::QuantumHackenbushCPrime(const Position *position) : QuantumHackenbush(position) {
 };
 
-std::vector<QuantumHackenbush*> QuantumHackenbushCPrime::getOptions(Player player) const {
-    std::vector<QuantumHackenbush*> options;
+Generator<QuantumHackenbush*> QuantumHackenbushCPrime::options(Player player) const {
     std::vector<Edge> pieces = position->getPieces(player);
 
     // Ruleset C': unsuperposed moves are allowed if and only if they are valid in all possible realisations
@@ -23,14 +22,12 @@ std::vector<QuantumHackenbush*> QuantumHackenbushCPrime::getOptions(Player playe
                 delete newRealisation;
             }
         }
-        if (allValidWithClassicalMove && option->getWidth() > 0) options.push_back(new QuantumHackenbushCPrime(option));
+        if (allValidWithClassicalMove && option->getWidth() > 0) co_yield new QuantumHackenbushCPrime(option);
         else delete option;
     }
 
-    auto superposedMoveOptions = getSuperposedMoveOptions<QuantumHackenbushCPrime>(pieces);
-    options.insert(options.end(), superposedMoveOptions.begin(), superposedMoveOptions.end());
-
-    return options;
+    auto superposedMoveOptionsGen = superposedMoveOptions<QuantumHackenbushCPrime>(pieces);
+    while (superposedMoveOptionsGen) co_yield superposedMoveOptionsGen();
 };
 
 QuantumHackenbushCPrime::~QuantumHackenbushCPrime() {

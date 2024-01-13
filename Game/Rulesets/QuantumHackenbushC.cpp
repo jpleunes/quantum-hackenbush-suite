@@ -3,8 +3,7 @@
 QuantumHackenbushC::QuantumHackenbushC(const Position *position) : QuantumHackenbush(position) {
 };
 
-std::vector<QuantumHackenbush*> QuantumHackenbushC::getOptions(Player player) const {
-    std::vector<QuantumHackenbush*> options;
+Generator<QuantumHackenbush*> QuantumHackenbushC::options(Player player) const {
     std::vector<Edge> pieces = position->getPieces(player);
 
     // Ruleset C: unsuperposed moves are allowed if and only if they are valid in all possible realisations
@@ -20,14 +19,12 @@ std::vector<QuantumHackenbush*> QuantumHackenbushC::getOptions(Player player) co
                 delete newRealisation;
             }
         }
-        if (allValid && option->getWidth() > 0) options.push_back(new QuantumHackenbushC(option));
+        if (allValid && option->getWidth() > 0) co_yield new QuantumHackenbushC(option);
         else delete option;
     }
 
-    auto superposedMoveOptions = getSuperposedMoveOptions<QuantumHackenbushC>(pieces);
-    options.insert(options.end(), superposedMoveOptions.begin(), superposedMoveOptions.end());
-
-    return options;
+    auto superposedMoveOptionsGen = superposedMoveOptions<QuantumHackenbushC>(pieces);
+    while (superposedMoveOptionsGen) co_yield superposedMoveOptionsGen();
 };
 
 QuantumHackenbushC::~QuantumHackenbushC() {

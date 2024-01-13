@@ -17,8 +17,6 @@ OutcomeClass QuantumHackenbush::determineOutcomeClass() const {
 }
 
 OutcomeClass QuantumHackenbush::determineOutcomeClass(Player turn) const {
-    int nodesCount = 1;
-
     std::vector<QuantumHackenbush*> options = getOptions(turn);
     switch (turn) {
         case Player::LEFT:

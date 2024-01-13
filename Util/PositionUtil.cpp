@@ -3,7 +3,7 @@
 #include "PositionUtil.h"
 
 // TODO: move everything to ClassicalPostion class?
-AdjacencyMatrixPosition *createRestrictedPosition(int nodeCount, int nBlueHalfs, int nRedHalfs, int nBlueWholes, int nRedWholes) {
+const AdjacencyMatrixPosition *createRestrictedPosition(int nodeCount, int nBlueHalfs, int nRedHalfs, int nBlueWholes, int nRedWholes) {
     AdjacencyMatrixPosition *classicalPosition = new AdjacencyMatrixPosition(nodeCount);
 
     const int requiredNodes = 1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes;

@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     int nRedWholes = std::stoi(argv[4]);
     std::string ruleset = argv[5];
 
-    AdjacencyMatrixPosition *start = createRestrictedPosition(1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes, nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
+    const AdjacencyMatrixPosition *start = createRestrictedPosition(1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes, nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
     start->printHumanReadable();
 
     QuantumHackenbush* game;

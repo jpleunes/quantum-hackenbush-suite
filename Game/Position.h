@@ -31,7 +31,4 @@ private:
     void addPossiblePieces(const ClassicalPosition* realisation);
 };
 
-// Creates a 1-wide starting position for the restricted variant of Hackenbush.
-const Position& createRestrictedPosition(size_t nodeCount, size_t nBlueHalfs, size_t nRedHalfs, size_t nBlueWholes, size_t nRedWholes);
-
 #endif // POSITION_H

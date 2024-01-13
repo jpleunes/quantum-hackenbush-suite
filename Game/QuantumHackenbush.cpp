@@ -1,42 +1,49 @@
+#include <stdexcept>
+
 #include "QuantumHackenbush.h"
 
 QuantumHackenbush::QuantumHackenbush(const Position *position) : position(position) {
 }
 
-OutcomeClass QuantumHackenbush::determineOutcomeClass() const { // TODO: count nodes to get an idea of the size of the tree
-    if (position->empty()) {
-        // We move to an empty superposition from a losing position->
-        // This means that the empty superposition has outcome class N, 
-        // which is the opposite of the outcome class of a losing position (P).
-        return OutcomeClass::N;
-    }
+OutcomeClass QuantumHackenbush::determineOutcomeClass() const {
+    auto leftStartOutcome = determineOutcomeClass(Player::LEFT);
+    auto rightStartOutcome = determineOutcomeClass(Player::RIGHT);
 
-    // We are not in any of the base cases, so we need to use recursion.
-    std::vector<OutcomeClass> leftOutcomes, rightOutcomes;
-    for (auto leftOption : getOptions(Player::LEFT)) {
-        leftOutcomes.push_back(leftOption->determineOutcomeClass());
-        delete leftOption;
-    }
-    for (auto rightOption : getOptions(Player::RIGHT)) {
-        rightOutcomes.push_back(rightOption->determineOutcomeClass());
-        delete rightOption;
-    }
+    // We do not need to check whether both left and right can win when they start, because such 
+    // situations are impossible (Hackenbush does not have N-positions).
+    if (leftStartOutcome == OutcomeClass::L || leftStartOutcome == OutcomeClass::P) return OutcomeClass::L;
+    else if (rightStartOutcome == OutcomeClass::R || rightStartOutcome == OutcomeClass::P) return OutcomeClass::R;
+    else return OutcomeClass::P;
+}
 
-    // TODO: possible improvement: only calculate outcome when needed
-    for (OutcomeClass leftOutcome : leftOutcomes) {
-        if (leftOutcome == OutcomeClass::L || leftOutcome == OutcomeClass::P) {
-            for (OutcomeClass rightOutcome : rightOutcomes) {
-                if (rightOutcome == OutcomeClass::R || rightOutcome == OutcomeClass::P) {
-                    return OutcomeClass::N;
+OutcomeClass QuantumHackenbush::determineOutcomeClass(Player turn) const {
+    int nodesCount = 1;
+
+    std::vector<QuantumHackenbush*> options = getOptions(turn);
+    switch (turn) {
+        case Player::LEFT:
+            for (QuantumHackenbush *option : options) {
+                OutcomeClass outcome = option->determineOutcomeClass(Player::RIGHT);
+                if (outcome == OutcomeClass::L || outcome == OutcomeClass::P) {
+                    for (QuantumHackenbush *o : options) delete o;
+                    return OutcomeClass::L;
                 }
             }
-            return OutcomeClass::L;
-        }
-    }
-    for (OutcomeClass rightOutcome : rightOutcomes) {
-        if (rightOutcome == OutcomeClass::R || rightOutcome == OutcomeClass::P) {
+
+            for (QuantumHackenbush *o : options) delete o;
             return OutcomeClass::R;
-        }
+        case Player::RIGHT:
+            for (QuantumHackenbush *option : options) {
+                OutcomeClass outcome = option->determineOutcomeClass(Player::LEFT);
+                if (outcome == OutcomeClass::R || outcome == OutcomeClass::P) {
+                    for (QuantumHackenbush *o : options) delete o;
+                    return OutcomeClass::R;
+                }
+            }
+
+            for (QuantumHackenbush *o : options) delete o;
+            return OutcomeClass::L;
+        default:
+            throw(std::domain_error("Unknown player case"));
     }
-    return OutcomeClass::P;
 };

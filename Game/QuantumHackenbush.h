@@ -1,8 +1,6 @@
 #ifndef QUANTUM_HACKENBUSH_H
 #define QUANTUM_HACKENBUSH_H
 
-#include <vector>
-
 #include "Position.h"
 
 const int width = 2;
@@ -28,7 +26,7 @@ public:
 
 protected:
     template<typename Ruleset>
-    std::vector<Ruleset*> getSuperposedMoveOptions(const std::vector<Edge> &pieces) const { // TODO: also allow moves with width >2
+    std::vector<Ruleset*> getSuperposedMoveOptions(const std::vector<Edge> &pieces) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
         std::vector<Ruleset*> options;
 
         if (pieces.size() < width) return options;
@@ -52,6 +50,8 @@ protected:
     const Position *position;
 
 private:
+    OutcomeClass determineOutcomeClass(Player turn) const;
+
     /// @brief TODO
     /// @param n 
     /// @return 

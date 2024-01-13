@@ -29,7 +29,9 @@ protected:
     template<typename Ruleset>
     Generator<Ruleset*> superposedMoveOptions(const std::vector<Edge> &pieces) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
         if (pieces.size() < width) co_return;
-        for (std::vector<size_t> move : indexCombinations(pieces.size())) {
+        auto indexCombinationsGen = indexCombinations(pieces.size());
+        while (indexCombinationsGen) {
+            std::vector<size_t> move = indexCombinationsGen();
             Position *option = new Position();
             for (size_t i = 0; i < position->getWidth(); i++) {
                 for (size_t pieceIndex : move) {
@@ -52,17 +54,15 @@ private:
     /// @brief TODO
     /// @param n 
     /// @return 
-    std::vector<std::vector<size_t>> indexCombinations(size_t n) const {
-        std::vector<std::vector<size_t>> result;
+    Generator<std::vector<size_t>> indexCombinations(size_t n) const {
         // This algorithm is a C++ adaptation of https://github.com/blazs/subsets
         std::vector<size_t> combination(width);
         int i, j, r;
 
         for (i = 0; i < width; ++i) combination[i] = i; // Initial combination
         while (true) {
-            // TODO: improve efficiency by using yield
             std::vector<size_t> combinationCopy = combination;
-            result.push_back(combinationCopy);
+            co_yield combinationCopy;
 
             if (combination[0] == n - width) break;
 
@@ -72,8 +72,6 @@ private:
             j = 2;
             for (++i; i < width; ++i, ++j) combination[i] = r + j;
         }
-
-        return result;
     }
 };
 

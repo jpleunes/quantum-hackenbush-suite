@@ -14,13 +14,9 @@ Generator<QuantumHackenbush*> QuantumHackenbushCPrime::options(Player player) co
         for (size_t i = 0; i < superposition->getWidth(); i++) {
             if (superposition->getRealisation(i).getPieces(player).empty()) continue;
             
-            Position *newRealisation = superposition->getRealisation(i).clone();
-            bool valid = newRealisation->removePiece(piece);
-            if (valid) option->addRealisation(newRealisation);
-            else {
-                allValidWithClassicalMove = false;
-                delete newRealisation;
-            }
+            Position *newRealisation = superposition->getRealisation(i).applyMove(piece);
+            if (newRealisation != nullptr) option->addRealisation(newRealisation);
+            else allValidWithClassicalMove = false;
         }
         if (allValidWithClassicalMove && option->getWidth() > 0) co_yield new QuantumHackenbushCPrime(option);
         else delete option;

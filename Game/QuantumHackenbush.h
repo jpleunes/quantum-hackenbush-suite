@@ -35,10 +35,8 @@ protected:
             Superposition *option = new Superposition();
             for (size_t i = 0; i < superposition->getWidth(); i++) {
                 for (size_t pieceIndex : move) {
-                    Position *newRealisation = superposition->getRealisation(i).clone();
-                    bool valid = newRealisation->removePiece(pieces[pieceIndex]);
-                    if (valid) option->addRealisation(newRealisation);
-                    else delete newRealisation;
+                    Position *newRealisation = superposition->getRealisation(i).applyMove(pieces[pieceIndex]);
+                    if (newRealisation != nullptr) option->addRealisation(newRealisation);
                 }
             }
             if (option->getWidth() > 0) co_yield new Ruleset(option);

@@ -11,13 +11,9 @@ Generator<QuantumHackenbush*> QuantumHackenbushC::options(Player player) const {
         Superposition *option = new Superposition();
         bool allValid = true;
         for (size_t i = 0; i < superposition->getWidth(); i++) {
-            Position *newRealisation = superposition->getRealisation(i).clone();
-            bool valid = newRealisation->removePiece(piece);
-            if (valid) option->addRealisation(newRealisation);
-            else {
-                allValid = false;
-                delete newRealisation;
-            }
+            Position *newRealisation = superposition->getRealisation(i).applyMove(piece);
+            if (newRealisation != nullptr) option->addRealisation(newRealisation);
+            else allValid = false;
         }
         if (allValid && option->getWidth() > 0) co_yield new QuantumHackenbushC(option);
         else delete option;

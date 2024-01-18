@@ -11,16 +11,6 @@ AdjacencyMatrixPosition::AdjacencyMatrixPosition(size_t nodeCount) {
     }
 }
 
-Position* AdjacencyMatrixPosition::clone() const {
-    AdjacencyMatrixPosition* clone = new AdjacencyMatrixPosition(adjacencyMatrix.size());
-    for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
-        for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {
-            clone->adjacencyMatrix[i][j] = adjacencyMatrix[i][j];
-        }
-    }
-    return clone;
-}
-
 void AdjacencyMatrixPosition::addPiece(Edge piece, PieceColour colour) {
     if (piece.first < piece.second) {
         adjacencyMatrix[piece.second][piece.first] = colour;
@@ -29,23 +19,6 @@ void AdjacencyMatrixPosition::addPiece(Edge piece, PieceColour colour) {
         adjacencyMatrix[piece.first][piece.second] = colour;
     }
     // TODO: check if this piece is connected to ground?
-}
-
-bool AdjacencyMatrixPosition::removePiece(Edge piece) {
-    bool removeSuccessful = false;
-    if (piece.first < piece.second) {
-        if (adjacencyMatrix[piece.second][piece.first] != PieceColour::NONE) removeSuccessful = true;
-        adjacencyMatrix[piece.second][piece.first] = PieceColour::NONE;
-    }
-    else {
-        if (adjacencyMatrix[piece.first][piece.second] != PieceColour::NONE) removeSuccessful = true;
-        adjacencyMatrix[piece.first][piece.second] = PieceColour::NONE;
-    }
-
-    // Remove all pieces which are no longer connected to ground
-    removeNotConnectedToGround(piece);
-    // TODO: remove unreachable nodes by resizing matrix (for this we need node id translations)
-    return removeSuccessful;
 }
 
 std::vector<Edge> AdjacencyMatrixPosition::getPieces(Player player) const {
@@ -70,6 +43,35 @@ std::vector<Edge> AdjacencyMatrixPosition::getPieces(Player player) const {
         }
     }
     return pieces;
+}
+
+Position* AdjacencyMatrixPosition::applyMove(Edge piece) const {
+    AdjacencyMatrixPosition* result = new AdjacencyMatrixPosition(adjacencyMatrix.size());
+    for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
+        for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {
+            result->adjacencyMatrix[i][j] = adjacencyMatrix[i][j];
+        }
+    }
+
+    bool removeSuccessful = false;
+    if (piece.first < piece.second) {
+        if (adjacencyMatrix[piece.second][piece.first] != PieceColour::NONE) removeSuccessful = true;
+        result->adjacencyMatrix[piece.second][piece.first] = PieceColour::NONE;
+    }
+    else {
+        if (adjacencyMatrix[piece.first][piece.second] != PieceColour::NONE) removeSuccessful = true;
+        result->adjacencyMatrix[piece.first][piece.second] = PieceColour::NONE;
+    }
+    if (!removeSuccessful) {
+        delete result;
+        return nullptr;
+    }
+
+    // Remove all pieces which are no longer connected to ground
+    result->removeNotConnectedToGround(piece);
+
+    // TODO: remove unreachable nodes by resizing matrix (for this we need node id translations)
+    return result;
 }
 
 void AdjacencyMatrixPosition::removeNotConnectedToGround(Edge removedPiece) {

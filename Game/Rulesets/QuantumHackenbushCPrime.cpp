@@ -1,20 +1,20 @@
 #include "QuantumHackenbushCPrime.h"
 
-QuantumHackenbushCPrime::QuantumHackenbushCPrime(const Position *position) : QuantumHackenbush(position) {
+QuantumHackenbushCPrime::QuantumHackenbushCPrime(const Superposition *superposition) : QuantumHackenbush(superposition) {
 };
 
 Generator<QuantumHackenbush*> QuantumHackenbushCPrime::options(Player player) const {
-    std::vector<Edge> pieces = position->getPieces(player);
+    std::vector<Edge> pieces = superposition->getPieces(player);
 
     // Ruleset C': unsuperposed moves are allowed if and only if they are valid in all possible realisations
     // where he still has at least one classical move
     for (Edge piece : pieces) {
-        Position *option = new Position();
+        Superposition *option = new Superposition();
         bool allValidWithClassicalMove = true;
-        for (size_t i = 0; i < position->getWidth(); i++) {
-            if (position->getRealisation(i).getPieces(player).empty()) continue;
+        for (size_t i = 0; i < superposition->getWidth(); i++) {
+            if (superposition->getRealisation(i).getPieces(player).empty()) continue;
             
-            ClassicalPosition *newRealisation = position->getRealisation(i).clone();
+            Position *newRealisation = superposition->getRealisation(i).clone();
             bool valid = newRealisation->removePiece(piece);
             if (valid) option->addRealisation(newRealisation);
             else {
@@ -31,5 +31,5 @@ Generator<QuantumHackenbush*> QuantumHackenbushCPrime::options(Player player) co
 };
 
 QuantumHackenbushCPrime::~QuantumHackenbushCPrime() {
-    delete position;
+    delete superposition;
 };

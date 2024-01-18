@@ -1,16 +1,16 @@
 #include "QuantumHackenbushD.h"
 
-QuantumHackenbushD::QuantumHackenbushD(const Position *position) : QuantumHackenbush(position) {
+QuantumHackenbushD::QuantumHackenbushD(const Superposition *superposition) : QuantumHackenbush(superposition) {
 };
 
 Generator<QuantumHackenbush*> QuantumHackenbushD::options(Player player) const {
-    std::vector<Edge> pieces = position->getPieces(player);
+    std::vector<Edge> pieces = superposition->getPieces(player);
 
     // Ruleset D: unsuperposed moves are always allowed
     for (Edge piece : pieces) {
-        Position *option = new Position();
-        for (size_t i = 0; i < position->getWidth(); i++) {
-            ClassicalPosition *newRealisation = position->getRealisation(i).clone();
+        Superposition *option = new Superposition();
+        for (size_t i = 0; i < superposition->getWidth(); i++) {
+            Position *newRealisation = superposition->getRealisation(i).clone();
             bool valid = newRealisation->removePiece(piece);
             if (valid) option->addRealisation(newRealisation);
             else delete newRealisation;
@@ -24,5 +24,5 @@ Generator<QuantumHackenbush*> QuantumHackenbushD::options(Player player) const {
 };
 
 QuantumHackenbushD::~QuantumHackenbushD() {
-    delete position;
+    delete superposition;
 };

@@ -3,11 +3,11 @@
 
 #include "ClassicalPosition.h"
 
-class AdjacencyMatrixPosition : public ClassicalPosition {
+class AdjacencyMatrixPosition : public Position {
 public:
     AdjacencyMatrixPosition(size_t nodeCount);
 
-    ClassicalPosition* clone() const override;
+    Position* clone() const override;
     size_t getNodeCount() const override;
     void increaseNodeCount(size_t count) override;
     void addPiece(Edge piece, PieceColour colour) override;

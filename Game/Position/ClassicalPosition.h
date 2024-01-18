@@ -18,9 +18,9 @@ enum class Player {
     RIGHT = (char) -1,
 };
 
-class ClassicalPosition {
+class Position {
 public:
-    virtual ClassicalPosition *clone() const = 0;
+    virtual Position *clone() const = 0;
     virtual size_t getNodeCount() const = 0;
     virtual void increaseNodeCount(size_t count) = 0;
     virtual void addPiece(Edge piece, PieceColour colour) = 0;
@@ -30,7 +30,7 @@ public:
     virtual void setPieceColour(Edge piece, PieceColour colour) = 0;
     virtual void printHumanReadable() const = 0;
 
-    virtual ~ClassicalPosition() = default;
+    virtual ~Position() = default;
 };
 
 #endif // CLASSICAL_POSITION_H

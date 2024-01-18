@@ -1,17 +1,17 @@
 #include "QuantumHackenbushB.h"
 
-QuantumHackenbushB::QuantumHackenbushB(const Position *position) : QuantumHackenbush(position) {
+QuantumHackenbushB::QuantumHackenbushB(const Superposition *superposition) : QuantumHackenbush(superposition) {
 };
 
 Generator<QuantumHackenbush*> QuantumHackenbushB::options(Player player) const {
-    std::vector<Edge> pieces = position->getPieces(player);
+    std::vector<Edge> pieces = superposition->getPieces(player);
 
     // Ruleset B: if a player has only one possible move within all realisations together, 
     // he can play it as an unsuperposed move
     if (pieces.size() == 1) {
-        Position *option = new Position();
-        for (size_t i = 0; i < position->getWidth(); i++) {
-            ClassicalPosition *newRealisation = position->getRealisation(i).clone();
+        Superposition *option = new Superposition();
+        for (size_t i = 0; i < superposition->getWidth(); i++) {
+            Position *newRealisation = superposition->getRealisation(i).clone();
             bool valid = newRealisation->removePiece(pieces[0]);
             if (valid) option->addRealisation(newRealisation);
             else delete newRealisation;
@@ -25,5 +25,5 @@ Generator<QuantumHackenbush*> QuantumHackenbushB::options(Player player) const {
 };
 
 QuantumHackenbushB::~QuantumHackenbushB() {
-    delete position;
+    delete superposition;
 };

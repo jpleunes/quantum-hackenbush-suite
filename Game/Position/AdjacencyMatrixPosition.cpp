@@ -1,7 +1,7 @@
 #include <queue>
 #include <iostream>
 
-#include "Position.h"
+#include "AdjacencyMatrixPosition.h"
 
 AdjacencyMatrixPosition::AdjacencyMatrixPosition(size_t nodeCount) {
     adjacencyMatrix.resize(nodeCount);
@@ -11,7 +11,7 @@ AdjacencyMatrixPosition::AdjacencyMatrixPosition(size_t nodeCount) {
     }
 }
 
-ClassicalPosition* AdjacencyMatrixPosition::clone() const {
+Position* AdjacencyMatrixPosition::clone() const {
     AdjacencyMatrixPosition* clone = new AdjacencyMatrixPosition(adjacencyMatrix.size());
     for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
         for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {

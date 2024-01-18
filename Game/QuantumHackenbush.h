@@ -1,7 +1,7 @@
 #ifndef QUANTUM_HACKENBUSH_H
 #define QUANTUM_HACKENBUSH_H
 
-#include "Position.h"
+#include "Superposition/Superposition.h"
 #include "../Util/Generator.h"
 
 const int width = 2;
@@ -18,7 +18,7 @@ enum class OutcomeClass {
  */
 class QuantumHackenbush {
 public:
-    QuantumHackenbush(const Position *position);
+    QuantumHackenbush(const Superposition *superposition);
 
     virtual Generator<QuantumHackenbush*> options(Player player) const = 0;
     OutcomeClass determineOutcomeClass() const;
@@ -32,10 +32,10 @@ protected:
         auto indexCombinationsGen = indexCombinations(pieces.size());
         while (indexCombinationsGen) {
             std::vector<size_t> move = indexCombinationsGen();
-            Position *option = new Position();
-            for (size_t i = 0; i < position->getWidth(); i++) {
+            Superposition *option = new Superposition();
+            for (size_t i = 0; i < superposition->getWidth(); i++) {
                 for (size_t pieceIndex : move) {
-                    ClassicalPosition *newRealisation = position->getRealisation(i).clone();
+                    Position *newRealisation = superposition->getRealisation(i).clone();
                     bool valid = newRealisation->removePiece(pieces[pieceIndex]);
                     if (valid) option->addRealisation(newRealisation);
                     else delete newRealisation;
@@ -46,7 +46,7 @@ protected:
         }
     }
 
-    const Position *position;
+    const Superposition *superposition;
 
 private:
     OutcomeClass determineOutcomeClass(Player turn) const;

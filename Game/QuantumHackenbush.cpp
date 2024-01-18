@@ -2,7 +2,7 @@
 
 #include "QuantumHackenbush.h"
 
-QuantumHackenbush::QuantumHackenbush(const Position *position) : position(position) {
+QuantumHackenbush::QuantumHackenbush(const Superposition *superposition) : superposition(superposition) {
 }
 
 OutcomeClass QuantumHackenbush::determineOutcomeClass() const {

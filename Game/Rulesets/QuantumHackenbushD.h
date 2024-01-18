@@ -5,7 +5,7 @@
 
 class QuantumHackenbushD : public QuantumHackenbush {
 public:
-    QuantumHackenbushD(const Position *position);
+    QuantumHackenbushD(const Superposition *superposition);
     Generator<QuantumHackenbush*> options(Player player) const override;
 
     ~QuantumHackenbushD() override;

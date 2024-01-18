@@ -1,9 +1,9 @@
 #include <stdexcept>
 #include <string>
 
-#include "Position.h"
+#include "Superposition.h"
 
-void Position::addPossiblePieces(const ClassicalPosition* realisation) {
+void Superposition::addPossiblePieces(const Position* realisation) {
     if (possiblePieces == nullptr) possiblePieces = new AdjacencyMatrixPosition(realisation->getNodeCount());
 
     size_t nodeCount = possiblePieces->getNodeCount(); // TODO: find number of possible nodes (nodes may have been deleted in some realisations)
@@ -18,38 +18,38 @@ void Position::addPossiblePieces(const ClassicalPosition* realisation) {
     }
 }
 
-Position::Position() {
+Superposition::Superposition() {
     possiblePieces = nullptr;
 }
 
-Position::Position(const ClassicalPosition *classicalPosition) : realisations({classicalPosition}) {
+Superposition::Superposition(const Position *classicalPosition) : realisations({classicalPosition}) {
     addPossiblePieces(classicalPosition);
 }
 
-size_t Position::getWidth() const {
+size_t Superposition::getWidth() const {
     return realisations.size();
 }
 
-bool Position::empty() const {
+bool Superposition::empty() const {
     return realisations.empty();
 }
 
-void Position::addRealisation(const ClassicalPosition* realisation) {
+void Superposition::addRealisation(const Position* realisation) {
     realisations.push_back(realisation);
 
     addPossiblePieces(realisation);
 }
 
-const ClassicalPosition& Position::getRealisation(size_t index) const {
+const Position& Superposition::getRealisation(size_t index) const {
     return *(realisations[index]);
 }
 
 // Gets the pieces for a given player across all realisations.
-std::vector<Edge> Position::getPieces(Player player) const {
+std::vector<Edge> Superposition::getPieces(Player player) const {
     return possiblePieces->getPieces(player);
 }
 
-Position::~Position() {
+Superposition::~Superposition() {
     for (auto realisation : realisations) delete realisation;
     delete possiblePieces;
 }

@@ -25,22 +25,22 @@ int main(int argc, char **argv) {
 
     QuantumHackenbush* game;
     if (ruleset == "classical") {
-        game = new ClassicalHackenbush(new Position(start));
+        game = new ClassicalHackenbush(new Superposition(start));
     }
     else if (ruleset == "a") {
-        game = new QuantumHackenbushA(new Position(start));
+        game = new QuantumHackenbushA(new Superposition(start));
     }
     else if (ruleset == "b") {
-        game = new QuantumHackenbushB(new Position(start));
+        game = new QuantumHackenbushB(new Superposition(start));
     }
     else if (ruleset == "c") {
-        game = new QuantumHackenbushC(new Position(start));
+        game = new QuantumHackenbushC(new Superposition(start));
     }
     else if (ruleset == "cprime") {
-        game = new QuantumHackenbushCPrime(new Position(start));
+        game = new QuantumHackenbushCPrime(new Superposition(start));
     }
     else if (ruleset == "d") {
-        game = new QuantumHackenbushD(new Position(start));
+        game = new QuantumHackenbushD(new Superposition(start));
     }
     else {
         std::cout << "Unknown ruleset" << std::endl;

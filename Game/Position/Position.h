@@ -1,5 +1,5 @@
-#ifndef CLASSICAL_POSITION_H
-#define CLASSICAL_POSITION_H
+#ifndef POSITION_H
+#define POSITION_H
 
 #include <vector>
 #include <cstddef>
@@ -33,4 +33,4 @@ public:
     virtual ~Position() = default;
 };
 
-#endif // CLASSICAL_POSITION_H
+#endif // POSITION_H

@@ -1,7 +1,7 @@
 #ifndef ADJACENCY_MATRIX_POSITION_H
 #define ADJACENCY_MATRIX_POSITION_H
 
-#include "ClassicalPosition.h"
+#include "Position.h"
 
 class AdjacencyMatrixPosition : public Position {
 public:

@@ -1,5 +1,5 @@
-#ifndef POSITION_H
-#define POSITION_H
+#ifndef SUPERPOSITION_H
+#define SUPERPOSITION_H
 
 #include <vector>
 
@@ -31,4 +31,4 @@ private:
     void addPossiblePieces(const Position* realisation);
 };
 
-#endif // POSITION_H
+#endif // SUPERPOSITION_H

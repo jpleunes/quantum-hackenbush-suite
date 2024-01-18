@@ -21,18 +21,6 @@ Position* AdjacencyMatrixPosition::clone() const {
     return clone;
 }
 
-size_t AdjacencyMatrixPosition::getNodeCount() const {
-    return adjacencyMatrix.size();
-}
-
-void AdjacencyMatrixPosition::increaseNodeCount(size_t count) {
-    // TODO: check if count is smaller than current count
-    adjacencyMatrix.resize(count);
-    for (size_t i = 0; i < count; i++) {
-        adjacencyMatrix[i].resize(count - i, PieceColour::NONE);
-    }
-}
-
 void AdjacencyMatrixPosition::addPiece(Edge piece, PieceColour colour) {
     if (piece.first < piece.second) {
         adjacencyMatrix[piece.second][piece.first] = colour;
@@ -82,24 +70,6 @@ std::vector<Edge> AdjacencyMatrixPosition::getPieces(Player player) const {
         }
     }
     return pieces;
-}
-
-PieceColour AdjacencyMatrixPosition::getPieceColour(Edge piece) const {
-    if (piece.first < piece.second) {
-        return adjacencyMatrix[piece.second][piece.first];
-    }
-    else {
-        return adjacencyMatrix[piece.first][piece.second];
-    }
-}
-
-void AdjacencyMatrixPosition::setPieceColour(Edge piece, PieceColour colour) {
-    if (piece.first < piece.second) {
-        adjacencyMatrix[piece.second][piece.first] = colour;
-    }
-    else {
-        adjacencyMatrix[piece.first][piece.second] = colour;
-    }
 }
 
 void AdjacencyMatrixPosition::removeNotConnectedToGround(Edge removedPiece) {

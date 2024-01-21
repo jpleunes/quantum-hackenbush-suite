@@ -12,11 +12,11 @@ AdjacencyMatrixPosition::AdjacencyMatrixPosition(size_t nodeCount) {
 }
 
 void AdjacencyMatrixPosition::addPiece(Edge piece, PieceColour colour) {
-    if (piece.first < piece.second) {
-        adjacencyMatrix[piece.second][piece.first] = colour;
+    if (piece.from < piece.to) {
+        adjacencyMatrix[piece.to][piece.from] = colour;
     }
     else {
-        adjacencyMatrix[piece.first][piece.second] = colour;
+        adjacencyMatrix[piece.from][piece.to] = colour;
     }
     // TODO: check if this piece is connected to ground?
 }
@@ -38,14 +38,14 @@ std::vector<Edge> AdjacencyMatrixPosition::getPieces(Player player) const {
     for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
         for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {
             if (adjacencyMatrix[i][j] == colour) {
-                pieces.push_back(std::make_pair(i, j));
+                pieces.push_back({ i, j });
             }
         }
     }
     return pieces;
 }
 
-Position* AdjacencyMatrixPosition::applyMove(Edge piece) const {
+Position<Edge>* AdjacencyMatrixPosition::applyMove(Edge piece) const {
     AdjacencyMatrixPosition* result = new AdjacencyMatrixPosition(adjacencyMatrix.size());
     for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
         for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {
@@ -54,13 +54,13 @@ Position* AdjacencyMatrixPosition::applyMove(Edge piece) const {
     }
 
     bool removeSuccessful = false;
-    if (piece.first < piece.second) {
-        if (adjacencyMatrix[piece.second][piece.first] != PieceColour::NONE) removeSuccessful = true;
-        result->adjacencyMatrix[piece.second][piece.first] = PieceColour::NONE;
+    if (piece.from < piece.to) {
+        if (adjacencyMatrix[piece.to][piece.from] != PieceColour::NONE) removeSuccessful = true;
+        result->adjacencyMatrix[piece.to][piece.from] = PieceColour::NONE;
     }
     else {
-        if (adjacencyMatrix[piece.first][piece.second] != PieceColour::NONE) removeSuccessful = true;
-        result->adjacencyMatrix[piece.first][piece.second] = PieceColour::NONE;
+        if (adjacencyMatrix[piece.from][piece.to] != PieceColour::NONE) removeSuccessful = true;
+        result->adjacencyMatrix[piece.from][piece.to] = PieceColour::NONE;
     }
     if (!removeSuccessful) {
         delete result;
@@ -84,8 +84,8 @@ void AdjacencyMatrixPosition::removeNotConnectedToGround(Edge removedPiece) {
         NodeId current = queue.front();
         queue.pop();
         visited[current] = true;
-        firstVisited |= current == removedPiece.first;
-        secondVisited |= current == removedPiece.second;
+        firstVisited |= current == removedPiece.from;
+        secondVisited |= current == removedPiece.to;
         if (firstVisited && secondVisited) return;
         for (size_t neighbour = 0; neighbour < adjacencyMatrix.size(); neighbour++) {
             const PieceColour pieceColour = (current < neighbour) ? adjacencyMatrix[neighbour][current] : adjacencyMatrix[current][neighbour];
@@ -109,7 +109,7 @@ void AdjacencyMatrixPosition::removeNotConnectedToGround(Edge removedPiece) {
 }
 
 void AdjacencyMatrixPosition::removeNotConnectedToGround() {
-    removeNotConnectedToGround(std::make_pair(-1, -1));
+    removeNotConnectedToGround(Edge(-1, -1));
 }
 
 void AdjacencyMatrixPosition::printHumanReadable() const {

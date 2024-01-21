@@ -11,21 +11,21 @@ const AdjacencyMatrixPosition *createRestrictedPosition(int nodeCount, int nBlue
     }
     int index = 1;
     for (int i = 0; i < nBlueHalfs; i++) {
-        classicalPosition->addPiece(std::make_pair(0, index), PieceColour::BLUE);
-        classicalPosition->addPiece(std::make_pair(index, index + 1), PieceColour::RED);
+        classicalPosition->addPiece(Edge(0, index), PieceColour::BLUE);
+        classicalPosition->addPiece(Edge(index, index + 1), PieceColour::RED);
         index += 2;
     }
     for (int i = 0; i < nRedHalfs; i++) {
-        classicalPosition->addPiece(std::make_pair(0, index), PieceColour::RED);
-        classicalPosition->addPiece(std::make_pair(index, index + 1), PieceColour::BLUE);
+        classicalPosition->addPiece(Edge(0, index), PieceColour::RED);
+        classicalPosition->addPiece(Edge(index, index + 1), PieceColour::BLUE);
         index += 2;
     }
     for (int i = 0; i < nBlueWholes; i++) {
-        classicalPosition->addPiece(std::make_pair(0, index), PieceColour::BLUE);
+        classicalPosition->addPiece(Edge(0, index), PieceColour::BLUE);
         index++;
     }
     for (int i = 0; i < nRedWholes; i++) {
-        classicalPosition->addPiece(std::make_pair(0, index), PieceColour::RED);
+        classicalPosition->addPiece(Edge(0, index), PieceColour::RED);
         index++;
     }
 

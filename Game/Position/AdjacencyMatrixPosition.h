@@ -3,7 +3,7 @@
 
 #include "Position.h"
 
-class AdjacencyMatrixPosition : public Position {
+class AdjacencyMatrixPosition : public Position<Edge> {
 public:
     AdjacencyMatrixPosition(size_t nodeCount);
 

@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     const AdjacencyMatrixPosition *start = createRestrictedPosition(1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes, nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
     start->printHumanReadable();
 
-    QuantumHackenbush* game;
+    QuantumHackenbush<Edge>* game;
     if (ruleset == "classical") {
         game = new ClassicalHackenbush(new Superposition(start));
     }

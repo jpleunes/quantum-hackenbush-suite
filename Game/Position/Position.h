@@ -4,28 +4,46 @@
 #include <vector>
 #include <cstddef>
 
+enum class PieceColour : char {
+	BLUE = 1,
+	RED = -1,
+	NONE = 0,
+};
+
+enum class Player : char {
+    LEFT = 1,
+    RIGHT = -1,
+};
+
 typedef size_t NodeId;
-typedef std::pair<NodeId, NodeId> Edge;
+struct Edge {
+    NodeId from;
+    NodeId to;
 
-enum class PieceColour {
-	BLUE = (char) 1,
-	RED = (char) -1,
-	NONE = (char) 0,
+    friend int operator<(const Edge& lhs, const Edge& rhs) {
+        return lhs.from < rhs.from || (lhs.from == rhs.from && lhs.to < rhs.to);
+    }
 };
 
-enum class Player {
-    LEFT = (char) 1,
-    RIGHT = (char) -1,
+typedef size_t RestrictedIndex;
+struct RestrictedPiece {
+    RestrictedIndex index;
+    PieceColour colour;
+
+    friend int operator<(const RestrictedPiece& lhs, const RestrictedPiece& rhs) {
+        return lhs.index < rhs.index || (lhs.index == rhs.index && lhs.colour < rhs.colour);
+    }
 };
 
+template<typename Piece>
 class Position {
 public:
-    virtual void addPiece(Edge piece, PieceColour colour) = 0;
-    virtual std::vector<Edge> getPieces(Player player) const = 0;    
+    virtual void addPiece(Piece piece, PieceColour colour) = 0; // TODO: move to GraphPosition?
+    virtual std::vector<Piece> getPieces(Player player) const = 0;    
     /// @brief Constructs a new Position representing the result of applying the given move.
     /// @param piece the piece to remove
     /// @return the resulting Position, or nullptr if the move was invalid
-    virtual Position *applyMove(Edge piece) const = 0;
+    virtual Position *applyMove(Piece piece) const = 0;
     virtual void printHumanReadable() const = 0;
 
     virtual ~Position() = default;

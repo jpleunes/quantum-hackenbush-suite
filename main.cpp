@@ -14,16 +14,16 @@ int main(int argc, char **argv) {
         std::cout << "Usage: qhs <nBlueHalfs> <nRedHalfs> <nBlueWholes> <nRedWholes> <ruleset>" << std::endl;
         return 1;
     }
-    int nBlueHalfs = std::stoi(argv[1]);
-    int nRedHalfs = std::stoi(argv[2]);
-    int nBlueWholes = std::stoi(argv[3]);
-    int nRedWholes = std::stoi(argv[4]);
+    size_t nBlueHalfs = std::stoi(argv[1]);
+    size_t nRedHalfs = std::stoi(argv[2]);
+    size_t nBlueWholes = std::stoi(argv[3]);
+    size_t nRedWholes = std::stoi(argv[4]);
     std::string ruleset = argv[5];
 
-    const AdjacencyMatrixPosition *start = createRestrictedPosition(1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes, nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
+    const RestrictedPosition *start = createRestrictedPosition(nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
     start->printHumanReadable();
 
-    QuantumHackenbush<Edge>* game;
+    QuantumHackenbush<RestrictedPiece>* game;
     if (ruleset == "classical") {
         game = new ClassicalHackenbush(new Superposition(start));
     }

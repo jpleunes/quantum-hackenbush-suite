@@ -1,9 +1,9 @@
 #ifndef ADJACENCY_MATRIX_POSITION_H
 #define ADJACENCY_MATRIX_POSITION_H
 
-#include "Position.h"
+#include "GraphPosition.h"
 
-class AdjacencyMatrixPosition : public Position<Edge> {
+class AdjacencyMatrixPosition : public GraphPosition {
 public:
     AdjacencyMatrixPosition(size_t nodeCount);
 

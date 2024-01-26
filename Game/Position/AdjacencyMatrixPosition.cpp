@@ -31,7 +31,7 @@ std::vector<Edge> AdjacencyMatrixPosition::getPieces(Player player) const {
             colour = PieceColour::RED;
             break;
         default:
-            throw(std::domain_error("Unknown player case"));
+            throw(std::domain_error("Unknown player case."));
     }
 
     std::vector<Edge> pieces;

@@ -38,12 +38,11 @@ struct RestrictedPiece {
 template<typename Piece>
 class Position {
 public:
-    virtual void addPiece(Piece piece, PieceColour colour) = 0; // TODO: move to GraphPosition?
     virtual std::vector<Piece> getPieces(Player player) const = 0;    
     /// @brief Constructs a new Position representing the result of applying the given move.
     /// @param piece the piece to remove
     /// @return the resulting Position, or nullptr if the move was invalid
-    virtual Position *applyMove(Piece piece) const = 0;
+    virtual Position* applyMove(Piece piece) const = 0;
     virtual void printHumanReadable() const = 0;
 
     virtual ~Position() = default;

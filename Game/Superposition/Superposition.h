@@ -4,7 +4,7 @@
 #include <vector>
 #include <set>
 
-#include "../Position/AdjacencyMatrixPosition.h"
+#include "../Position/Position.h"
 
 template<typename Piece>
 class Superposition {

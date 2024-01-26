@@ -113,7 +113,7 @@ OutcomeClass QuantumHackenbush<Piece>::determineOutcomeClass(Player turn) const 
             }
             return OutcomeClass::L;
         default:
-            throw(std::domain_error("Unknown player case"));
+            throw(std::domain_error("Unknown player case."));
     }
 };
 

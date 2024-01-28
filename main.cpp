@@ -21,7 +21,9 @@ int main(int argc, char **argv) {
     std::string ruleset = argv[5];
 
     const RestrictedPosition *start = createRestrictedPosition(nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
+    #ifdef DEBUG
     start->printHumanReadable();
+    #endif
 
     QuantumHackenbush<RestrictedPiece>* game;
     if (ruleset == "classical") {
@@ -46,20 +48,19 @@ int main(int argc, char **argv) {
         std::cout << "Unknown ruleset" << std::endl;
         return 1;
     }
-    std::cout << "Outcome class:" << std::endl;
     switch (game->determineOutcomeClass())
     {
         case OutcomeClass::L:
-            std::cout << "L-position" << std::endl;
+            std::cout << "L" << std::endl;
             break;
         case OutcomeClass::R:
-            std::cout << "R-position" << std::endl;
+            std::cout << "R" << std::endl;
             break;
         case OutcomeClass::N:
-            std::cout << "N-position" << std::endl;
+            std::cout << "N" << std::endl;
             break;
         case OutcomeClass::P:
-            std::cout << "P-position" << std::endl;
+            std::cout << "P" << std::endl;
             break;
         default: std::cout << "error" << std::endl;
     }

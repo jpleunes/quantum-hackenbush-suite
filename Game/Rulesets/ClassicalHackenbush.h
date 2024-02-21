@@ -3,33 +3,30 @@
 
 #include "../QuantumHackenbush.h"
 
-template<typename Piece>
-class ClassicalHackenbush : public QuantumHackenbush<Piece> {
+template<typename Realisation, typename Piece>
+class ClassicalHackenbush : public QuantumHackenbush<Realisation, Piece> {
 public:
-    ClassicalHackenbush(const Superposition<Piece>* superposition);
-    Generator<QuantumHackenbush<Piece>*> options(Player player) const override;
+    ClassicalHackenbush(const Superposition<Realisation, Piece> superposition);
+    Generator<QuantumHackenbush<Realisation, Piece>*> options(Player player) const override;
 
-    ~ClassicalHackenbush() override;
+    ~ClassicalHackenbush() override = default;
 };
 
 // This is a templated class, so the implementations need to go here
 
-template<typename Piece>
-ClassicalHackenbush<Piece>::ClassicalHackenbush(const Superposition<Piece>* superposition) : QuantumHackenbush<Piece>(superposition) {
+template<typename Realisation, typename Piece>
+ClassicalHackenbush<Realisation, Piece>::ClassicalHackenbush(const Superposition<Realisation, Piece> superposition) : QuantumHackenbush<Realisation, Piece>(superposition) {
 };
 
-template<typename Piece>
-Generator<QuantumHackenbush<Piece>*> ClassicalHackenbush<Piece>::options(Player player) const {
-    std::vector<Piece> pieces = this->superposition->getPieces(player);
+template<typename Realisation, typename Piece>
+Generator<QuantumHackenbush<Realisation, Piece>*> ClassicalHackenbush<Realisation, Piece>::options(Player player) const {
+    std::vector<Piece> pieces = this->superposition.getPieces(player);
     for (size_t i = 0; i < pieces.size(); i++) {
-        Position<Piece> *newPosition = this->superposition->getRealisation(0).applyMove(pieces[i]);
-        co_yield new ClassicalHackenbush<Piece>(new Superposition<Piece>(newPosition));
+        auto* newPositionPtr = (*this->superposition.getRealisations().begin())->applyMove(pieces[i]);
+        Realisation newPosition = std::move(*static_cast<Realisation*>(newPositionPtr));
+        delete newPositionPtr;
+        co_yield new ClassicalHackenbush<Realisation, Piece>(Superposition<Realisation, Piece>(newPosition));
     }
-};
-
-template<typename Piece>
-ClassicalHackenbush<Piece>::~ClassicalHackenbush() {
-    delete this->superposition;
 };
 
 #endif // CLASSICAL_HACKENBUSH_H

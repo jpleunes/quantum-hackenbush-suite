@@ -6,6 +6,13 @@
 RestrictedPosition::RestrictedPosition() : entries() {
 }
 
+bool RestrictedPosition::operator==(const RestrictedPosition& other) const {
+    if (entries.size() != other.entries.size()) return false;
+    for (size_t i = 0; i < entries.size(); i++)
+        if (entries[i] != other.entries[i]) return false;
+    return true;
+}
+
 void RestrictedPosition::addPiece(RestrictedPiece piece) {
     if (piece.index >= entries.size()) entries.resize(piece.index + 1, HalfOrWhole::NONE);
 

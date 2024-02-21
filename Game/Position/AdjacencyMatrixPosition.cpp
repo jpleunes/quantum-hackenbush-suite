@@ -11,6 +11,17 @@ AdjacencyMatrixPosition::AdjacencyMatrixPosition(size_t nodeCount) {
     }
 }
 
+bool AdjacencyMatrixPosition::operator==(const AdjacencyMatrixPosition& other) const {
+    if (adjacencyMatrix.size() != other.adjacencyMatrix.size()) return false;
+    for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
+        if (adjacencyMatrix[i].size() != other.adjacencyMatrix[i].size()) return false;
+        for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
+            if (adjacencyMatrix[i][j] != other.adjacencyMatrix[i][j]) return false;
+    }
+        
+    return true;
+}
+
 void AdjacencyMatrixPosition::addPiece(Edge piece, PieceColour colour) {
     if (piece.from < piece.to) {
         adjacencyMatrix[piece.to][piece.from] = colour;

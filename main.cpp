@@ -1,12 +1,15 @@
 #include <iostream>
 
-#include "Util/PositionUtil.h"
+#include "Util/CreatePositionUtil.h"
 #include "Game/Rulesets/ClassicalHackenbush.h"
 #include "Game/Rulesets/QuantumHackenbushA.h"
 #include "Game/Rulesets/QuantumHackenbushB.h"
 #include "Game/Rulesets/QuantumHackenbushC.h"
 #include "Game/Rulesets/QuantumHackenbushCPrime.h"
 #include "Game/Rulesets/QuantumHackenbushD.h"
+
+typedef RestrictedPosition PositionType;
+typedef RestrictedPiece PieceType;
 
 int main(int argc, char **argv) {
     if (argc < 6) {
@@ -20,29 +23,29 @@ int main(int argc, char **argv) {
     size_t nRedWholes = std::stoi(argv[4]);
     std::string ruleset = argv[5];
 
-    const RestrictedPosition *start = createRestrictedPosition(nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
+    const RestrictedPosition start = createRestrictedPosition(nBlueHalfs, nRedHalfs, nBlueWholes, nRedWholes);
     #ifdef DEBUG
     start->printHumanReadable();
     #endif
 
-    QuantumHackenbush<RestrictedPiece>* game;
+    QuantumHackenbush<PositionType, PieceType>* game;
     if (ruleset == "classical") {
-        game = new ClassicalHackenbush(new Superposition(start));
+        game = new ClassicalHackenbush<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
     }
     else if (ruleset == "a") {
-        game = new QuantumHackenbushA(new Superposition(start));
+        game = new QuantumHackenbushA<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
     }
     else if (ruleset == "b") {
-        game = new QuantumHackenbushB(new Superposition(start));
+        game = new QuantumHackenbushB<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
     }
     else if (ruleset == "c") {
-        game = new QuantumHackenbushC(new Superposition(start));
+        game = new QuantumHackenbushC<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
     }
     else if (ruleset == "cprime") {
-        game = new QuantumHackenbushCPrime(new Superposition(start));
+        game = new QuantumHackenbushCPrime<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
     }
     else if (ruleset == "d") {
-        game = new QuantumHackenbushD(new Superposition(start));
+        game = new QuantumHackenbushD<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
     }
     else {
         std::cout << "Unknown ruleset" << std::endl;

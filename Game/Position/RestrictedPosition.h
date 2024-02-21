@@ -2,6 +2,7 @@
 #define RESTRICTED_POSITION_H
 
 #include "Position.h"
+#include "../../Util/HashUtil.h"
 
 enum class HalfOrWhole : char {
     BLUE_HALF,
@@ -14,6 +15,7 @@ enum class HalfOrWhole : char {
 class RestrictedPosition : public Position<RestrictedPiece> {
 public:
     RestrictedPosition();
+    bool operator==(const RestrictedPosition& other) const;
 
     void addPiece(RestrictedPiece piece);
     std::vector<RestrictedPiece> getPieces(Player player) const override;
@@ -22,8 +24,18 @@ public:
 
     ~RestrictedPosition() override = default;
 
-private:
     std::vector<HalfOrWhole> entries;
 };
+
+namespace std {
+    template<>
+    struct hash<RestrictedPosition> {
+        size_t operator()(const RestrictedPosition& position) const {
+            std::vector<uint32_t> intVec;
+            for (HalfOrWhole x : position.entries) intVec.push_back((uint32_t) x);
+            return std::hash<std::vector<uint32_t>>()(intVec);
+        }
+    };
+}
 
 #endif // RESTRICTED_POSITION_H

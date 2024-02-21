@@ -1,11 +1,15 @@
 #ifndef ADJACENCY_MATRIX_POSITION_H
 #define ADJACENCY_MATRIX_POSITION_H
 
+#include <boost/container_hash/hash.hpp>
+
 #include "GraphPosition.h"
+#include "../../Util/HashUtil.h"
 
 class AdjacencyMatrixPosition : public GraphPosition {
 public:
     AdjacencyMatrixPosition(size_t nodeCount);
+    bool operator==(const AdjacencyMatrixPosition& other) const;
 
     void addPiece(Edge piece, PieceColour colour) override;
     std::vector<Edge> getPieces(Player player) const override;
@@ -18,10 +22,31 @@ public:
     void printHumanReadable() const override;
 
     ~AdjacencyMatrixPosition() override = default;
+
+    std::vector<std::vector<PieceColour>> adjacencyMatrix;
     
 private:
-    std::vector<std::vector<PieceColour>> adjacencyMatrix;
     const NodeId groundId = 0;
 };
+
+namespace std {
+    template<>
+    struct hash<AdjacencyMatrixPosition> {
+        size_t operator()(const AdjacencyMatrixPosition& position) const {
+            size_t hash = 0;
+            for (const std::vector<PieceColour>& row : position.adjacencyMatrix) {
+                std::vector<uint32_t> intVec;
+                for (PieceColour x : row) intVec.push_back((uint32_t) x);
+                if (hash == 0) {
+                    hash = std::hash<std::vector<uint32_t>>()(intVec);
+                    continue;
+                }
+                boost::hash_combine(hash, std::hash<std::vector<uint32_t>>()(intVec));
+            }
+
+            return hash;
+        }
+    };
+}
 
 #endif // ADJACENCY_MATRIX_POSITION_H

@@ -3,66 +3,56 @@
 
 #include <vector>
 #include <set>
+#include <unordered_set>
 
-#include "../Position/Position.h"
-
-template<typename Piece>
+template<typename Realisation, typename Piece>
 class Superposition {
 public:
     Superposition() = default;
-    Superposition(const Position<Piece> *classicalPosition);
-    size_t getWidth() const;
+    Superposition(const Realisation classicalPosition);
     bool empty() const;
-    void addRealisation(const Position<Piece> *realisation);
-    const Position<Piece>& getRealisation(size_t index) const;
+    void addRealisation(const Realisation realisation);
+    const std::vector<const Realisation*> getRealisations() const;
     // Gets the pieces which exist in at least one realisation (and can thus be used in a move) 
     // for a given player.
     std::vector<Piece> getPieces(Player player) const;
 
-    ~Superposition();
+    ~Superposition() = default;
     
 private:
-    std::vector<const Position<Piece>*> realisations;
+    std::unordered_set<Realisation> realisations;
 };
 
 // This is a templated class, so the implementations need to go here
 
-template<typename Piece>
-Superposition<Piece>::Superposition(const Position<Piece> *classicalPosition) : realisations({classicalPosition}) {
+template<typename Realisation, typename Piece>
+Superposition<Realisation, Piece>::Superposition(const Realisation classicalPosition) : realisations({classicalPosition}) {
 }
 
-template<typename Piece>
-size_t Superposition<Piece>::getWidth() const {
-    return realisations.size();
-}
-
-template<typename Piece>
-bool Superposition<Piece>::empty() const {
+template<typename Realisation, typename Piece>
+bool Superposition<Realisation, Piece>::empty() const {
     return realisations.empty();
 }
 
-template<typename Piece>
-void Superposition<Piece>::addRealisation(const Position<Piece>* realisation) {
-    realisations.push_back(realisation);
+template<typename Realisation, typename Piece>
+void Superposition<Realisation, Piece>::addRealisation(const Realisation realisation) {
+    realisations.emplace(realisation);
 }
 
-template<typename Piece>
-const Position<Piece>& Superposition<Piece>::getRealisation(size_t index) const {
-    return *(realisations[index]);
+template<typename Realisation, typename Piece>
+const std::vector<const Realisation*> Superposition<Realisation, Piece>::getRealisations() const {
+    std::vector<const Realisation*> result;
+    for (const Realisation& realisation : realisations) result.push_back(&realisation);
+    return result;
 }
 
-template<typename Piece>
-std::vector<Piece> Superposition<Piece>::getPieces(Player player) const {
+template<typename Realisation, typename Piece>
+std::vector<Piece> Superposition<Realisation, Piece>::getPieces(Player player) const {
     std::set<Piece> pieces;
-    for (const Position<Piece> *realisation : realisations) {
-        for (Piece piece : realisation->getPieces(player)) pieces.insert(piece);
+    for (const Realisation& realisation : realisations) {
+        for (Piece piece : realisation.getPieces(player)) pieces.insert(piece);
     }
     return std::vector<Piece>(pieces.begin(), pieces.end());
-}
-
-template<typename Piece>
-Superposition<Piece>::~Superposition() {
-    for (auto realisation : realisations) delete realisation;
 }
 
 #endif // SUPERPOSITION_H

@@ -3,48 +3,46 @@
 
 #include "../QuantumHackenbush.h"
 
-template<typename Piece>
-class QuantumHackenbushCPrime : public QuantumHackenbush<Piece> {
+template<typename Realisation, typename Piece>
+class QuantumHackenbushCPrime : public QuantumHackenbush<Realisation, Piece> {
 public:
-    QuantumHackenbushCPrime(const Superposition<Piece>* superposition);
-    Generator<QuantumHackenbush<Piece>*> options(Player player) const override;
+    QuantumHackenbushCPrime(const Superposition<Realisation, Piece> superposition);
+    Generator<QuantumHackenbush<Realisation, Piece>*> options(Player player) const override;
 
-    ~QuantumHackenbushCPrime() override;
+    ~QuantumHackenbushCPrime() override = default;
 };
 
 // This is a templated class, so the implementations need to go here
 
-template<typename Piece>
-QuantumHackenbushCPrime<Piece>::QuantumHackenbushCPrime(const Superposition<Piece>* superposition) : QuantumHackenbush<Piece>(superposition) {
+template<typename Realisation, typename Piece>
+QuantumHackenbushCPrime<Realisation, Piece>::QuantumHackenbushCPrime(const Superposition<Realisation, Piece> superposition) : QuantumHackenbush<Realisation, Piece>(superposition) {
 };
 
-template<typename Piece>
-Generator<QuantumHackenbush<Piece>*> QuantumHackenbushCPrime<Piece>::options(Player player) const {
-    std::vector<Piece> pieces = this->superposition->getPieces(player);
+template<typename Realisation, typename Piece>
+Generator<QuantumHackenbush<Realisation, Piece>*> QuantumHackenbushCPrime<Realisation, Piece>::options(Player player) const {
+    std::vector<Piece> pieces = this->superposition.getPieces(player);
 
     // Ruleset C': unsuperposed moves are allowed if and only if they are valid in all possible realisations
     // where he still has at least one classical move
     for (Piece piece : pieces) {
-        Superposition<Piece> *option = new Superposition<Piece>();
+        Superposition<Realisation, Piece> option;
         bool allValidWithClassicalMove = true;
-        for (size_t i = 0; i < this->superposition->getWidth(); i++) {
-            if (this->superposition->getRealisation(i).getPieces(player).empty()) continue;
+        for (const Realisation* realisation : this->superposition.getRealisations()) {
+            if (realisation->getPieces(player).empty()) continue;
             
-            Position<Piece> *newRealisation = this->superposition->getRealisation(i).applyMove(piece);
-            if (newRealisation != nullptr) option->addRealisation(newRealisation);
+            auto* newRealisationPtr = realisation->applyMove(piece);
+            if (newRealisationPtr != nullptr) {
+                Realisation newRealisation = std::move(*static_cast<Realisation*>(newRealisationPtr));
+                delete newRealisationPtr;
+                option.addRealisation(newRealisation);
+            }
             else allValidWithClassicalMove = false;
         }
-        if (allValidWithClassicalMove && option->getWidth() > 0) co_yield new QuantumHackenbushCPrime<Piece>(option);
-        else delete option;
+        if (allValidWithClassicalMove && !option.empty()) co_yield new QuantumHackenbushCPrime<Realisation, Piece>(option);
     }
 
-    auto superposedMoveOptionsGen = superposedMoveOptions<QuantumHackenbushCPrime<Piece>>(pieces);
+    auto superposedMoveOptionsGen = superposedMoveOptions<QuantumHackenbushCPrime<Realisation, Piece>>(pieces);
     while (superposedMoveOptionsGen) co_yield superposedMoveOptionsGen();
-};
-
-template<typename Piece>
-QuantumHackenbushCPrime<Piece>::~QuantumHackenbushCPrime() {
-    delete this->superposition;
 };
 
 #endif // QUANTUM_HACKENBUSH_C_PRIME_H

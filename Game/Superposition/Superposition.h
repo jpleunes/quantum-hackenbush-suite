@@ -55,4 +55,18 @@ std::vector<Piece> Superposition<Realisation, Piece>::getPieces(Player player) c
     return std::vector<Piece>(pieces.begin(), pieces.end());
 }
 
+namespace std {
+    template<typename Realisation, typename Piece>
+    struct hash<Superposition<Realisation, Piece>> {
+        size_t operator()(const Superposition<Realisation, Piece>& superposition) const {
+            size_t hash = 0;
+            for (const Realisation& realisation : superposition.getRealisations()) {
+                boost::hash_combine(hash, std::hash<Realisation>()(realisation));
+            }
+
+            return hash;
+        }
+    };
+}
+
 #endif // SUPERPOSITION_H

@@ -3,35 +3,32 @@
 
 #include "../QuantumHackenbush.h"
 
-template<typename Realisation, typename Piece>
-class QuantumHackenbushD : public QuantumHackenbush<Realisation, Piece> {
+template<typename Realisation>
+class QuantumHackenbushD : public QuantumHackenbush<Realisation> {
 public:
-    QuantumHackenbushD(const Superposition<Realisation, Piece> superposition);
-    Generator<QuantumHackenbush<Realisation, Piece>*> options(Player player) const override;
+    QuantumHackenbushD(const Superposition<Realisation> superposition);
+    Generator<QuantumHackenbush<Realisation>*> options(Player player) const override;
 
     ~QuantumHackenbushD() override = default;
 };
 
 // This is a templated class, so the implementations need to go here
 
-template<typename Realisation, typename Piece>
-QuantumHackenbushD<Realisation, Piece>::QuantumHackenbushD(const Superposition<Realisation, Piece> superposition) : QuantumHackenbush<Realisation, Piece>(superposition) {
+template<typename Realisation>
+QuantumHackenbushD<Realisation>::QuantumHackenbushD(const Superposition<Realisation> superposition) : QuantumHackenbush<Realisation>(superposition) {
 };
 
-template<typename Realisation, typename Piece>
-Generator<QuantumHackenbush<Realisation, Piece>*> QuantumHackenbushD<Realisation, Piece>::options(Player player) const {
-    std::vector<Piece> pieces = this->superposition.getPieces(player);
+template<typename Realisation>
+Generator<QuantumHackenbush<Realisation>*> QuantumHackenbushD<Realisation>::options(Player player) const {
+    std::vector<typename Realisation::Piece> pieces = this->superposition.getPieces(player);
 
     // Ruleset D: unsuperposed moves are always allowed
-    for (Piece piece : pieces) {
-        Superposition<Realisation, Piece> option;
-        for (const Realisation* realisation : this->superposition.getRealisations()) {
-            auto* newRealisationPtr = realisation->applyMove(piece);
-            if (newRealisationPtr != nullptr) {
-                Realisation newRealisation = std::move(*static_cast<Realisation*>(newRealisationPtr));
-                delete newRealisationPtr;
-                option.addRealisation(newRealisation);
-            }
+    for (typename Realisation::Piece piece : pieces) {
+        Superposition<Realisation> option;
+        for (PositionId realisationId : this->superposition.getRealisationIds()) {
+            Realisation& realisation = PositionDatabase<Realisation>::getInstance().getGame(realisationId);
+            PositionId newRealisationId = realisation.applyMove(piece);
+            if (newRealisationId != ILLEGAL_POSITION_ID) option.addRealisationId(newRealisationId);
         }
         if (!option.empty()) co_yield new QuantumHackenbushD(option);
     }

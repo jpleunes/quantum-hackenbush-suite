@@ -16,39 +16,36 @@ enum class OutcomeClass {
 /**
  * An abstract class representing a ruleset of Quantum Hackenbush.
  */
-template<typename Realisation, typename Piece>
+template<typename Realisation>
 class QuantumHackenbush {
 public:
-    QuantumHackenbush(const Superposition<Realisation, Piece> superposition);
+    QuantumHackenbush(const Superposition<Realisation> superposition);
 
-    virtual Generator<QuantumHackenbush<Realisation, Piece>*> options(Player player) const = 0;
+    virtual Generator<QuantumHackenbush<Realisation>*> options(Player player) const = 0;
     OutcomeClass determineOutcomeClass() const;
 
     virtual ~QuantumHackenbush() = default;
 
 protected:
     template<typename Ruleset>
-    Generator<Ruleset*> superposedMoveOptions(const std::vector<Piece> &pieces) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
+    Generator<Ruleset*> superposedMoveOptions(const std::vector<typename Realisation::Piece> &pieces) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
         if (pieces.size() < width) co_return;
         auto indexCombinationsGen = indexCombinations(pieces.size());
         while (indexCombinationsGen) {
             std::vector<size_t> move = indexCombinationsGen();
-            Superposition<Realisation, Piece> option = Superposition<Realisation, Piece>();
-            for (const Realisation* realisation : superposition.getRealisations()) {
+            Superposition<Realisation> option = Superposition<Realisation>();
+            for (PositionId realisationId : superposition.getRealisationIds()) {
                 for (size_t pieceIndex : move) {
-                    auto* newRealisationPtr = realisation->applyMove(pieces[pieceIndex]);
-                    if (newRealisationPtr != nullptr) {
-                        Realisation newRealisation = std::move(*static_cast<Realisation*>(newRealisationPtr));
-                        delete newRealisationPtr;
-                        option.addRealisation(newRealisation);
-                    }
+                    Realisation& realisation = PositionDatabase<Realisation>::getInstance().getGame(realisationId);
+                    PositionId newRealisationId = realisation.applyMove(pieces[pieceIndex]);
+                    if (newRealisationId != ILLEGAL_POSITION_ID) option.addRealisationId(newRealisationId);
                 }
             }
             if (!option.empty()) co_yield new Ruleset(option);
         }
     }
 
-    const Superposition<Realisation, Piece> superposition;
+    const Superposition<Realisation> superposition;
 
 private:
     OutcomeClass determineOutcomeClass(Player turn) const;
@@ -79,12 +76,12 @@ private:
 
 // This is a templated class, so the implementations need to go here
 
-template<typename Realisation, typename Piece>
-QuantumHackenbush<Realisation, Piece>::QuantumHackenbush(const Superposition<Realisation, Piece> superposition) : superposition(superposition) {
+template<typename Realisation>
+QuantumHackenbush<Realisation>::QuantumHackenbush(const Superposition<Realisation> superposition) : superposition(superposition) {
 }
 
-template<typename Realisation, typename Piece>
-OutcomeClass QuantumHackenbush<Realisation, Piece>::determineOutcomeClass() const {
+template<typename Realisation>
+OutcomeClass QuantumHackenbush<Realisation>::determineOutcomeClass() const {
     auto leftStartOutcome = determineOutcomeClass(Player::LEFT);
     auto rightStartOutcome = determineOutcomeClass(Player::RIGHT);
 
@@ -95,13 +92,13 @@ OutcomeClass QuantumHackenbush<Realisation, Piece>::determineOutcomeClass() cons
     else return OutcomeClass::P;
 }
 
-template<typename Realisation, typename Piece>
-OutcomeClass QuantumHackenbush<Realisation, Piece>::determineOutcomeClass(Player turn) const {
-    Generator<QuantumHackenbush<Realisation, Piece>*> optionsGen = options(turn);
+template<typename Realisation>
+OutcomeClass QuantumHackenbush<Realisation>::determineOutcomeClass(Player turn) const {
+    Generator<QuantumHackenbush<Realisation>*> optionsGen = options(turn);
     switch (turn) {
         case Player::LEFT:
             while (optionsGen) {
-                QuantumHackenbush<Realisation, Piece> *option = optionsGen();
+                QuantumHackenbush<Realisation> *option = optionsGen();
                 OutcomeClass outcome = option->determineOutcomeClass(Player::RIGHT);
                 delete option;
                 if (outcome == OutcomeClass::L || outcome == OutcomeClass::P) return OutcomeClass::L;
@@ -109,7 +106,7 @@ OutcomeClass QuantumHackenbush<Realisation, Piece>::determineOutcomeClass(Player
             return OutcomeClass::R;
         case Player::RIGHT:
             while (optionsGen) {
-                QuantumHackenbush<Realisation, Piece> *option = optionsGen();
+                QuantumHackenbush<Realisation> *option = optionsGen();
                 OutcomeClass outcome = option->determineOutcomeClass(Player::LEFT);
                 delete option;
                 if (outcome == OutcomeClass::R || outcome == OutcomeClass::P) return OutcomeClass::R;

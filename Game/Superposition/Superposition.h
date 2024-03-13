@@ -3,68 +3,71 @@
 
 #include <vector>
 #include <set>
-#include <unordered_set>
 
-template<typename Realisation, typename Piece>
+#include "../Position/PositionDatabase.h"
+
+template<typename Realisation>
 class Superposition {
 public:
     Superposition() = default;
+    Superposition(PositionId classicalPositionId);
     Superposition(const Realisation classicalPosition);
     bool empty() const;
-    void addRealisation(const Realisation realisation);
-    const std::vector<const Realisation*> getRealisations() const;
+    void addRealisationId(PositionId realisationId);
+    const std::vector<PositionId> getRealisationIds() const;
     // Gets the pieces which exist in at least one realisation (and can thus be used in a move) 
     // for a given player.
-    std::vector<Piece> getPieces(Player player) const;
+    std::vector<typename Realisation::Piece> getPieces(Player player) const;
 
     ~Superposition() = default;
     
 private:
-    std::unordered_set<Realisation> realisations;
+    std::set<PositionId> realisationIds;
 };
 
 // This is a templated class, so the implementations need to go here
 
-template<typename Realisation, typename Piece>
-Superposition<Realisation, Piece>::Superposition(const Realisation classicalPosition) : realisations({classicalPosition}) {
+template<typename Realisation>
+Superposition<Realisation>::Superposition(PositionId classicalPositionId) : realisationIds({classicalPositionId}) {
 }
 
-template<typename Realisation, typename Piece>
-bool Superposition<Realisation, Piece>::empty() const {
-    return realisations.empty();
+template<typename Realisation>
+Superposition<Realisation>::Superposition(const Realisation classicalPosition) : realisationIds({PositionDatabase<Realisation>::getInstance().getPositionId(classicalPosition)}) {
 }
 
-template<typename Realisation, typename Piece>
-void Superposition<Realisation, Piece>::addRealisation(const Realisation realisation) {
-    realisations.emplace(realisation);
+template<typename Realisation>
+bool Superposition<Realisation>::empty() const {
+    return realisationIds.empty();
 }
 
-template<typename Realisation, typename Piece>
-const std::vector<const Realisation*> Superposition<Realisation, Piece>::getRealisations() const {
-    std::vector<const Realisation*> result;
-    for (const Realisation& realisation : realisations) result.push_back(&realisation);
+template<typename Realisation>
+void Superposition<Realisation>::addRealisationId(PositionId realisationId) {
+    realisationIds.emplace(realisationId);
+}
+
+template<typename Realisation>
+const std::vector<PositionId> Superposition<Realisation>::getRealisationIds() const {
+    std::vector<PositionId> result;
+    for (PositionId realisationId : realisationIds) result.push_back(realisationId);
     return result;
 }
 
-template<typename Realisation, typename Piece>
-std::vector<Piece> Superposition<Realisation, Piece>::getPieces(Player player) const {
-    std::set<Piece> pieces;
-    for (const Realisation& realisation : realisations) {
-        for (Piece piece : realisation.getPieces(player)) pieces.insert(piece);
+template<typename Realisation>
+std::vector<typename Realisation::Piece> Superposition<Realisation>::getPieces(Player player) const {
+    std::set<typename Realisation::Piece> pieces;
+    for (PositionId realisationId : realisationIds) {
+        for (typename Realisation::Piece piece : PositionDatabase<Realisation>::getInstance().getGame(realisationId).getPieces(player)) {
+            pieces.insert(piece);
+        }
     }
-    return std::vector<Piece>(pieces.begin(), pieces.end());
+    return std::vector<typename Realisation::Piece>(pieces.begin(), pieces.end());
 }
 
 namespace std {
-    template<typename Realisation, typename Piece>
-    struct hash<Superposition<Realisation, Piece>> {
-        size_t operator()(const Superposition<Realisation, Piece>& superposition) const {
-            size_t hash = 0;
-            for (const Realisation& realisation : superposition.getRealisations()) {
-                boost::hash_combine(hash, std::hash<Realisation>()(realisation));
-            }
-
-            return hash;
+    template<typename Realisation>
+    struct hash<Superposition<Realisation>> {
+        size_t operator()(const Superposition<Realisation>& superposition) const {
+            return std::hash<std::vector<PositionId>>()(superposition.getRealisationIds());
         }
     };
 }

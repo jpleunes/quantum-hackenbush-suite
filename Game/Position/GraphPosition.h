@@ -9,8 +9,8 @@ public:
     virtual std::vector<Edge> getPieces(Player player) const = 0;    
     /// @brief Constructs a new Position representing the result of applying the given move.
     /// @param piece the piece to remove
-    /// @return the resulting Position, or nullptr if the move was invalid
-    virtual Position* applyMove(Edge piece) const = 0;
+    /// @return the id of the resulting Position, or ILLEGAL_POSITION_ID if the move was illegal
+    virtual PositionId applyMove(Edge piece) const = 0;
     virtual void printHumanReadable() const = 0;
 
     virtual ~GraphPosition() = default;

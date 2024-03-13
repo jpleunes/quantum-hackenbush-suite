@@ -3,6 +3,10 @@
 
 #include <vector>
 #include <cstddef>
+#include <memory>
+#include <map>
+#include <optional>
+#include <limits>
 
 enum class PieceColour : char {
 	BLUE = 1,
@@ -35,17 +39,35 @@ struct RestrictedPiece {
     }
 };
 
+typedef size_t PositionId;
+#define ILLEGAL_POSITION_ID std::numeric_limits<PositionId>::max()
+
+// Forward declaration
+template<typename Piece>
+class Position;
+
+template<typename Piece>
+struct PositionCacheBlock {
+    std::optional<std::vector<Piece>> leftPieces;
+    std::optional<std::vector<Piece>> rightPieces;
+    std::map<Piece, PositionId> moveOptions;
+};
+
 template<typename Piece>
 class Position {
 public:
     virtual std::vector<Piece> getPieces(Player player) const = 0;    
     /// @brief Constructs a new Position representing the result of applying the given move.
     /// @param piece the piece to remove
-    /// @return the resulting Position, or nullptr if the move was invalid
-    virtual Position* applyMove(Piece piece) const = 0;
+    /// @return the resulting Position, or nullptr if the move was illegal
+    virtual PositionId applyMove(Piece piece) const = 0;
     virtual void printHumanReadable() const = 0;
+    void setCache(const PositionCacheBlock<Piece>& cache) const { this->cache = cache; };
 
     virtual ~Position() = default;
+
+protected:
+    mutable PositionCacheBlock<Piece> cache;
 };
 
 #endif // POSITION_H

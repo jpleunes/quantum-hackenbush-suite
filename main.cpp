@@ -9,7 +9,6 @@
 #include "Game/Rulesets/QuantumHackenbushD.h"
 
 typedef RestrictedPosition PositionType;
-typedef RestrictedPiece PieceType;
 
 int main(int argc, char **argv) {
     if (argc < 6) {
@@ -28,24 +27,24 @@ int main(int argc, char **argv) {
     start->printHumanReadable();
     #endif
 
-    QuantumHackenbush<PositionType, PieceType>* game;
+    QuantumHackenbush<PositionType>* game;
     if (ruleset == "classical") {
-        game = new ClassicalHackenbush<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
+        game = new ClassicalHackenbush<PositionType>(Superposition<PositionType>(start));
     }
     else if (ruleset == "a") {
-        game = new QuantumHackenbushA<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
+        game = new QuantumHackenbushA<PositionType>(Superposition<PositionType>(start));
     }
     else if (ruleset == "b") {
-        game = new QuantumHackenbushB<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
+        game = new QuantumHackenbushB<PositionType>(Superposition<PositionType>(start));
     }
     else if (ruleset == "c") {
-        game = new QuantumHackenbushC<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
+        game = new QuantumHackenbushC<PositionType>(Superposition<PositionType>(start));
     }
     else if (ruleset == "cprime") {
-        game = new QuantumHackenbushCPrime<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
+        game = new QuantumHackenbushCPrime<PositionType>(Superposition<PositionType>(start));
     }
     else if (ruleset == "d") {
-        game = new QuantumHackenbushD<PositionType, PieceType>(Superposition<PositionType, PieceType>(start));
+        game = new QuantumHackenbushD<PositionType>(Superposition<PositionType>(start));
     }
     else {
         std::cout << "Unknown ruleset" << std::endl;

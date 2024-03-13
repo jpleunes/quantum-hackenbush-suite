@@ -8,12 +8,16 @@
 
 class AdjacencyMatrixPosition : public GraphPosition {
 public:
+    typedef Edge Piece;
+
+    AdjacencyMatrixPosition();
+    AdjacencyMatrixPosition(const AdjacencyMatrixPosition& other);
     AdjacencyMatrixPosition(size_t nodeCount);
     bool operator==(const AdjacencyMatrixPosition& other) const;
 
     void addPiece(Edge piece, PieceColour colour) override;
     std::vector<Edge> getPieces(Player player) const override;
-    Position* applyMove(Edge piece) const override;
+    PositionId applyMove(Edge piece) const override;
     /// @brief Removes all pieces that are no longer connected to the ground.
     /// @param removedPiece piece that was last removed, can be used to stop the breadth-first search earlier
     void removeNotConnectedToGround(Edge removedPiece);

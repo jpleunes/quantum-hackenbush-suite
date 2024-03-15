@@ -42,10 +42,6 @@ struct RestrictedPiece {
 typedef size_t PositionId;
 #define ILLEGAL_POSITION_ID std::numeric_limits<PositionId>::max()
 
-// Forward declaration
-template<typename Piece>
-class Position;
-
 template<typename Piece>
 struct PositionCacheBlock {
     std::optional<std::vector<Piece>> leftPieces;
@@ -62,7 +58,6 @@ public:
     /// @return the resulting Position, or nullptr if the move was illegal
     virtual PositionId applyMove(Piece piece) const = 0;
     virtual void printHumanReadable() const = 0;
-    void setCache(const PositionCacheBlock<Piece>& cache) const { this->cache = cache; };
 
     virtual ~Position() = default;
 

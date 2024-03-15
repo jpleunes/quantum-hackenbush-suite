@@ -5,13 +5,14 @@
 #include <set>
 
 #include "../Position/PositionDatabase.h"
+#include "../../Util/HashUtil.h"
 
 template<typename Realisation>
 class Superposition {
 public:
     Superposition() = default;
     Superposition(PositionId classicalPositionId);
-    Superposition(const Realisation classicalPosition);
+    bool operator==(const Superposition<Realisation>& other) const { return realisationIds == other.realisationIds; }
     bool empty() const;
     void addRealisationId(PositionId realisationId);
     const std::vector<PositionId> getRealisationIds() const;
@@ -29,10 +30,6 @@ private:
 
 template<typename Realisation>
 Superposition<Realisation>::Superposition(PositionId classicalPositionId) : realisationIds({classicalPositionId}) {
-}
-
-template<typename Realisation>
-Superposition<Realisation>::Superposition(const Realisation classicalPosition) : realisationIds({PositionDatabase<Realisation>::getInstance().getPositionId(classicalPosition)}) {
 }
 
 template<typename Realisation>
@@ -56,7 +53,7 @@ template<typename Realisation>
 std::vector<typename Realisation::Piece> Superposition<Realisation>::getPieces(Player player) const {
     std::set<typename Realisation::Piece> pieces;
     for (PositionId realisationId : realisationIds) {
-        for (typename Realisation::Piece piece : PositionDatabase<Realisation>::getInstance().getGame(realisationId).getPieces(player)) {
+        for (typename Realisation::Piece piece : PositionDatabase<Realisation>::getInstance().getPosition(realisationId).getPieces(player)) {
             pieces.insert(piece);
         }
     }
@@ -67,7 +64,9 @@ namespace std {
     template<typename Realisation>
     struct hash<Superposition<Realisation>> {
         size_t operator()(const Superposition<Realisation>& superposition) const {
-            return std::hash<std::vector<PositionId>>()(superposition.getRealisationIds());
+            std::vector<uint32_t> intVec;
+            for (PositionId realisationId : superposition.getRealisationIds()) intVec.push_back((uint32_t) realisationId);
+            return std::hash<std::vector<uint32_t>>()(intVec);
         }
     };
 }

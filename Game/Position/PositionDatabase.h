@@ -7,10 +7,11 @@
 
 #include "Position.h"
 
+// TODO: move into templated generic Database class
 /**
  * Singleton database for keeping track of the positions we have already encountered in our computations.
  * Allows for cached results to be reused, instead of having to compute them again.
-*/
+ */
 template<typename PositionType>
 class PositionDatabase {
 public:
@@ -23,9 +24,9 @@ public:
      */
     PositionId getPositionId(const PositionType& position);
     /**
-     * Gets the game with the given id from the database.
-    */
-    PositionType& getGame(PositionId id);
+     * Gets the position with the given id from the database.
+     */
+    PositionType& getPosition(PositionId id);
 
 private:
     PositionDatabase();
@@ -39,12 +40,6 @@ private:
 
 template<typename PositionType>
 PositionDatabase<PositionType>::PositionDatabase() {
-    existingPositions.emplace_back(std::make_unique<PositionType>());
-    existingPositions.back()->setCache({
-        std::vector<typename PositionType::Piece>(),
-        std::vector<typename PositionType::Piece>(),
-        std::map<typename PositionType::Piece, PositionId>()
-    });
     existingPositions.reserve(1024);
 }
 
@@ -59,7 +54,7 @@ PositionId PositionDatabase<PositionType>::getPositionId(const PositionType& pos
 }
 
 template<typename PositionType>
-PositionType& PositionDatabase<PositionType>::getGame(PositionId id) {
+PositionType& PositionDatabase<PositionType>::getPosition(PositionId id) {
     return *existingPositions[id];
 }
 

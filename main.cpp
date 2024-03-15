@@ -27,30 +27,31 @@ int main(int argc, char **argv) {
     start->printHumanReadable();
     #endif
 
-    QuantumHackenbush<PositionType>* game;
+    PositionId startId = PositionDatabase<PositionType>::getInstance().getPositionId(start);
+    OutcomeClass outcome;
     if (ruleset == "classical") {
-        game = new ClassicalHackenbush<PositionType>(Superposition<PositionType>(start));
+        outcome = ClassicalHackenbush<PositionType>(Superposition<PositionType>(startId)).determineOutcomeClass<ClassicalHackenbush<PositionType>>();
     }
     else if (ruleset == "a") {
-        game = new QuantumHackenbushA<PositionType>(Superposition<PositionType>(start));
+        outcome = QuantumHackenbushA<PositionType>(Superposition<PositionType>(startId)).determineOutcomeClass<QuantumHackenbushA<PositionType>>();
     }
     else if (ruleset == "b") {
-        game = new QuantumHackenbushB<PositionType>(Superposition<PositionType>(start));
+        outcome = QuantumHackenbushB<PositionType>(Superposition<PositionType>(startId)).determineOutcomeClass<QuantumHackenbushB<PositionType>>();
     }
     else if (ruleset == "c") {
-        game = new QuantumHackenbushC<PositionType>(Superposition<PositionType>(start));
+        outcome = QuantumHackenbushC<PositionType>(Superposition<PositionType>(startId)).determineOutcomeClass<QuantumHackenbushC<PositionType>>();
     }
     else if (ruleset == "cprime") {
-        game = new QuantumHackenbushCPrime<PositionType>(Superposition<PositionType>(start));
+        outcome = QuantumHackenbushCPrime<PositionType>(Superposition<PositionType>(startId)).determineOutcomeClass<QuantumHackenbushCPrime<PositionType>>();
     }
     else if (ruleset == "d") {
-        game = new QuantumHackenbushD<PositionType>(Superposition<PositionType>(start));
+        outcome = QuantumHackenbushD<PositionType>(Superposition<PositionType>(startId)).determineOutcomeClass<QuantumHackenbushD<PositionType>>();
     }
     else {
         std::cout << "Unknown ruleset" << std::endl;
         return 1;
     }
-    switch (game->determineOutcomeClass())
+    switch (outcome)
     {
         case OutcomeClass::L:
             std::cout << "L" << std::endl;
@@ -67,6 +68,5 @@ int main(int argc, char **argv) {
         default: std::cout << "error" << std::endl;
     }
 
-    delete game;
     return 0;
 }

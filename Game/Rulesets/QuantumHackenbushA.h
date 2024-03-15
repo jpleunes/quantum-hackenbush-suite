@@ -7,7 +7,8 @@ template<typename Realisation>
 class QuantumHackenbushA : public QuantumHackenbush<Realisation> {
 public:
     QuantumHackenbushA(const Superposition<Realisation> superposition);
-    Generator<QuantumHackenbush<Realisation>*> options(Player player) const override;
+    bool operator==(const QuantumHackenbushA<Realisation>& other) const;
+    std::vector<GameInstanceId> getMoveOptions(Player player) const override;
 
     ~QuantumHackenbushA() override = default;
 };
@@ -19,10 +20,22 @@ QuantumHackenbushA<Realisation>::QuantumHackenbushA(const Superposition<Realisat
 };
 
 template<typename Realisation>
-Generator<QuantumHackenbush<Realisation>*> QuantumHackenbushA<Realisation>::options(Player player) const {
-    std::vector<typename Realisation::Piece> pieces = this->superposition.getPieces(player);
-    auto superposedMoveOptionsGen = superposedMoveOptions<QuantumHackenbushA<Realisation>>(pieces);
-    while (superposedMoveOptionsGen) co_yield superposedMoveOptionsGen();
+bool QuantumHackenbushA<Realisation>::operator==(const QuantumHackenbushA<Realisation>& other) const {
+    return this->superposition == other.superposition;
+}
+
+template<typename Realisation>
+std::vector<GameInstanceId> QuantumHackenbushA<Realisation>::getMoveOptions(Player player) const {
+    return getSuperposedMoveOptions<QuantumHackenbushA<Realisation>>(player);
 };
+
+namespace std {
+    template<typename Realisation>
+    struct hash<QuantumHackenbushA<Realisation>> {
+        size_t operator()(const QuantumHackenbushA<Realisation>& quantumHackenbush) const {
+            return std::hash<Superposition<Realisation>>()(quantumHackenbush.getSuperposition());
+        }
+    };
+}
 
 #endif // QUANTUM_HACKENBUSH_A_H

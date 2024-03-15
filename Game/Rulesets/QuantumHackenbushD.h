@@ -7,7 +7,8 @@ template<typename Realisation>
 class QuantumHackenbushD : public QuantumHackenbush<Realisation> {
 public:
     QuantumHackenbushD(const Superposition<Realisation> superposition);
-    Generator<QuantumHackenbush<Realisation>*> options(Player player) const override;
+    bool operator==(const QuantumHackenbushD<Realisation>& other) const;
+    std::vector<GameInstanceId> getMoveOptions(Player player) const override;
 
     ~QuantumHackenbushD() override = default;
 };
@@ -19,22 +20,36 @@ QuantumHackenbushD<Realisation>::QuantumHackenbushD(const Superposition<Realisat
 };
 
 template<typename Realisation>
-Generator<QuantumHackenbush<Realisation>*> QuantumHackenbushD<Realisation>::options(Player player) const {
-    std::vector<typename Realisation::Piece> pieces = this->superposition.getPieces(player);
+bool QuantumHackenbushD<Realisation>::operator==(const QuantumHackenbushD<Realisation>& other) const {
+    return this->superposition == other.superposition;
+}
 
+template<typename Realisation>
+std::vector<GameInstanceId> QuantumHackenbushD<Realisation>::getMoveOptions(Player player) const {
+    std::vector<typename Realisation::Piece> pieces = this->superposition.getPieces(player);
     // Ruleset D: unsuperposed moves are always allowed
+    std::vector<GameInstanceId> result;
     for (typename Realisation::Piece piece : pieces) {
         Superposition<Realisation> option;
         for (PositionId realisationId : this->superposition.getRealisationIds()) {
-            Realisation& realisation = PositionDatabase<Realisation>::getInstance().getGame(realisationId);
+            Realisation& realisation = PositionDatabase<Realisation>::getInstance().getPosition(realisationId);
             PositionId newRealisationId = realisation.applyMove(piece);
             if (newRealisationId != ILLEGAL_POSITION_ID) option.addRealisationId(newRealisationId);
         }
-        if (!option.empty()) co_yield new QuantumHackenbushD(option);
+        if (!option.empty()) result.emplace_back(GameInstanceDatabase<QuantumHackenbushD<Realisation>>::getInstance().getGameInstanceId(QuantumHackenbushD<Realisation>(option)));
     }
-
-    auto superposedMoveOptionsGen = superposedMoveOptions<QuantumHackenbushD>(pieces);
-    while (superposedMoveOptionsGen) co_yield superposedMoveOptionsGen();
+    std::vector<GameInstanceId> superposedMoveOptions = getSuperposedMoveOptions<QuantumHackenbushD<Realisation>>(player);
+    result.insert(result.end(), superposedMoveOptions.begin(), superposedMoveOptions.end());
+    return result;
 };
+
+namespace std {
+    template<typename Realisation>
+    struct hash<QuantumHackenbushD<Realisation>> {
+        size_t operator()(const QuantumHackenbushD<Realisation>& quantumHackenbush) const {
+            return std::hash<Superposition<Realisation>>()(quantumHackenbush.getSuperposition());
+        }
+    };
+}
 
 #endif // QUANTUM_HACKENBUSH_D_H

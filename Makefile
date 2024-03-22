@@ -17,3 +17,5 @@ $(BUILD_DIR)/%.o : %.cpp
 
 clean :
 	rm -f -r $(BUILD_DIR)
+	mkdir $(BUILD_DIR)
+	touch $(BUILD_DIR)/.gitkeep

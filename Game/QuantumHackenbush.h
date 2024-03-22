@@ -2,9 +2,11 @@
 #define QUANTUM_HACKENBUSH_H
 
 #include <limits>
+#include <algorithm>
 
 #include "Superposition/Superposition.h"
 #include "../Util/Generator.h"
+#include "DyadicRational.h"
 
 const int width = 2;
 
@@ -24,6 +26,9 @@ struct GameInstanceCacheBlock {
     std::optional<OutcomeClass> outcome;
     std::optional<OutcomeClass> leftStartsOutcome;
     std::optional<OutcomeClass> rightStartsOutcome;
+    std::optional<bool> isNumber;
+    std::optional<DyadicRational> value;
+    std::optional<size_t> birthday;
 };
 
 /**
@@ -32,8 +37,6 @@ struct GameInstanceCacheBlock {
 template<typename Realisation>
 class QuantumHackenbush {
 public:
-    typedef std::vector<typename Realisation::Piece> Move;
-
     QuantumHackenbush(const Superposition<Realisation> superposition);
     const Superposition<Realisation>& getSuperposition() const { return superposition; }
 
@@ -46,13 +49,17 @@ public:
         auto leftStartOutcome = determineOutcomeClass<Ruleset>(Player::LEFT);
         auto rightStartOutcome = determineOutcomeClass<Ruleset>(Player::RIGHT);
 
-        // We do not need to check whether both left and right can win when they start, because such 
-        // situations are impossible (Hackenbush does not have N-positions).
-        if (leftStartOutcome == OutcomeClass::L || leftStartOutcome == OutcomeClass::P) {
+        bool leftHasWinningMove = leftStartOutcome == OutcomeClass::L || leftStartOutcome == OutcomeClass::P;
+        bool rightHasWinningMove = rightStartOutcome == OutcomeClass::R || rightStartOutcome == OutcomeClass::P;
+        if (leftHasWinningMove && rightHasWinningMove) {
+            cache.outcome = OutcomeClass::N;
+            return OutcomeClass::N;
+        }
+        if (leftHasWinningMove) {
             cache.outcome = OutcomeClass::L;
             return OutcomeClass::L;
         }
-        else if (rightStartOutcome == OutcomeClass::R || rightStartOutcome == OutcomeClass::P) {
+        else if (rightHasWinningMove) {
             cache.outcome = OutcomeClass::R;
             return OutcomeClass::R;
         }
@@ -60,6 +67,91 @@ public:
             cache.outcome = OutcomeClass::P;
             return OutcomeClass::P;
         }
+    }
+
+    template<typename Ruleset>
+    size_t determineBirthday(const std::vector<GameInstanceId>& moveOptionIds) const {
+        if (cache.birthday.has_value()) return cache.birthday.value();
+        size_t birthday = 0;
+        if (!moveOptionIds.empty()) {
+            for (GameInstanceId moveOptionId : moveOptionIds)
+                birthday = std::max(birthday, GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineBirthday<Ruleset>());
+        }
+        else {
+            std::vector<GameInstanceId> leftMoveOptionIds = getMoveOptions(Player::LEFT);
+            std::vector<GameInstanceId> rightMoveOptionIds = getMoveOptions(Player::RIGHT);
+            if (leftMoveOptionIds.empty() && rightMoveOptionIds.empty()) {
+                cache.birthday = 0;
+                return 0;
+            }
+            for (GameInstanceId moveOptionId : leftMoveOptionIds)
+                birthday = std::max(birthday, GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineBirthday<Ruleset>());
+            for (GameInstanceId moveOptionId : rightMoveOptionIds)
+                birthday = std::max(birthday, GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineBirthday<Ruleset>());
+        }
+        birthday += 1;
+        cache.birthday = birthday;
+        return birthday;
+    }
+
+    template<typename Ruleset>
+    size_t determineBirthday() const {        
+        return determineBirthday<Ruleset>(std::vector<GameInstanceId>());
+    }
+
+    template<typename Ruleset>
+    std::optional<DyadicRational> determineValue() const {
+        if (cache.isNumber.has_value() && !cache.isNumber.value()) return {};
+        if (cache.value.has_value()) return cache.value.value();
+
+        std::vector<GameInstanceId> leftMoveOptionIds = getMoveOptions(Player::LEFT);
+        std::vector<GameInstanceId> rightMoveOptionIds = getMoveOptions(Player::RIGHT);
+        if (leftMoveOptionIds.empty() && rightMoveOptionIds.empty()) {
+            DyadicRational value(0);
+            cache.value = value;
+            return value;
+        }
+        else if (leftMoveOptionIds.empty()) {
+            // At this point we have already calculated all move options.
+            // We will need them again in determineBirthday, so we might as well pass them along.
+            DyadicRational value((long long) -determineBirthday<Ruleset>(rightMoveOptionIds));
+            cache.value = value;
+            return value;
+        }
+        else if (rightMoveOptionIds.empty()) {
+            // At this point we have already calculated all move options.
+            // We will need them again in determineBirthday, so we might as well pass them along.
+            DyadicRational value((long long) determineBirthday<Ruleset>(leftMoveOptionIds));
+            cache.value = value;
+            return value;
+        }
+
+        std::vector<DyadicRational> leftValues;
+        for (GameInstanceId moveOptionId : leftMoveOptionIds) {
+            std::optional<DyadicRational> leftValue = GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineValue<Ruleset>();
+            if (!leftValue.has_value()) {
+                cache.isNumber = false;
+                return {};
+            }
+            leftValues.emplace_back(leftValue.value());
+        }
+        DyadicRational bestLeftValue = *std::max_element(leftValues.begin(), leftValues.end());
+
+        std::vector<DyadicRational> rightValues;
+        for (GameInstanceId moveOptionId : rightMoveOptionIds) {
+            std::optional<DyadicRational> rightValue = GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineValue<Ruleset>();
+            if (!rightValue.has_value()) {
+                cache.isNumber = false;
+                return {};
+            }
+            rightValues.emplace_back(rightValue.value());
+        }
+        DyadicRational bestRightValue = *std::min_element(rightValues.begin(), rightValues.end());
+
+        std::optional<DyadicRational> value = getSimplestNumber(bestLeftValue, bestRightValue);
+        cache.isNumber = value.has_value();
+        cache.value = value;
+        return value;
     }
 
     virtual ~QuantumHackenbush() = default;
@@ -98,7 +190,7 @@ private:
     template<typename Ruleset>
     OutcomeClass determineOutcomeClass(Player turn) const {
         if (turn == Player::LEFT && cache.leftStartsOutcome.has_value()) return cache.leftStartsOutcome.value();
-        if (turn == Player::RIGHT && cache.rightStartsOutcome.has_value()) return cache.rightStartsOutcome.value();
+        else if (turn == Player::RIGHT && cache.rightStartsOutcome.has_value()) return cache.rightStartsOutcome.value();
 
         std::vector<GameInstanceId> moveOptionIds = getMoveOptions(turn);
         switch (turn) {

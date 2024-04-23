@@ -32,7 +32,7 @@ struct GameInstanceCacheBlock {
 };
 
 /**
- * An abstract class representing a ruleset of Quantum Hackenbush.
+ * An abstract class representing a flavour of Quantum Hackenbush.
  */
 template<typename Realisation>
 class QuantumHackenbush {
@@ -42,12 +42,12 @@ public:
 
     virtual std::vector<GameInstanceId> getMoveOptions(Player player) const = 0;
 
-    template<typename Ruleset>
+    template<typename Flavour>
     OutcomeClass determineOutcomeClass() const {
         if (cache.outcome.has_value()) return cache.outcome.value();
 
-        auto leftStartOutcome = determineOutcomeClass<Ruleset>(Player::LEFT);
-        auto rightStartOutcome = determineOutcomeClass<Ruleset>(Player::RIGHT);
+        auto leftStartOutcome = determineOutcomeClass<Flavour>(Player::LEFT);
+        auto rightStartOutcome = determineOutcomeClass<Flavour>(Player::RIGHT);
 
         bool leftHasWinningMove = leftStartOutcome == OutcomeClass::L || leftStartOutcome == OutcomeClass::P;
         bool rightHasWinningMove = rightStartOutcome == OutcomeClass::R || rightStartOutcome == OutcomeClass::P;
@@ -69,13 +69,13 @@ public:
         }
     }
 
-    template<typename Ruleset>
+    template<typename Flavour>
     size_t determineBirthday(const std::vector<GameInstanceId>& moveOptionIds) const {
         if (cache.birthday.has_value()) return cache.birthday.value();
         size_t birthday = 0;
         if (!moveOptionIds.empty()) {
             for (GameInstanceId moveOptionId : moveOptionIds)
-                birthday = std::max(birthday, GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineBirthday<Ruleset>());
+                birthday = std::max(birthday, GameInstanceDatabase<Flavour>::getInstance().getGameInstance(moveOptionId).template determineBirthday<Flavour>());
         }
         else {
             std::vector<GameInstanceId> leftMoveOptionIds = getMoveOptions(Player::LEFT);
@@ -85,21 +85,21 @@ public:
                 return 0;
             }
             for (GameInstanceId moveOptionId : leftMoveOptionIds)
-                birthday = std::max(birthday, GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineBirthday<Ruleset>());
+                birthday = std::max(birthday, GameInstanceDatabase<Flavour>::getInstance().getGameInstance(moveOptionId).template determineBirthday<Flavour>());
             for (GameInstanceId moveOptionId : rightMoveOptionIds)
-                birthday = std::max(birthday, GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineBirthday<Ruleset>());
+                birthday = std::max(birthday, GameInstanceDatabase<Flavour>::getInstance().getGameInstance(moveOptionId).template determineBirthday<Flavour>());
         }
         birthday += 1;
         cache.birthday = birthday;
         return birthday;
     }
 
-    template<typename Ruleset>
+    template<typename Flavour>
     size_t determineBirthday() const {        
-        return determineBirthday<Ruleset>(std::vector<GameInstanceId>());
+        return determineBirthday<Flavour>(std::vector<GameInstanceId>());
     }
 
-    template<typename Ruleset>
+    template<typename Flavour>
     std::optional<DyadicRational> determineValue() const {
         if (cache.isNumber.has_value() && !cache.isNumber.value()) return {};
         if (cache.value.has_value()) return cache.value.value();
@@ -114,21 +114,21 @@ public:
         else if (leftMoveOptionIds.empty()) {
             // At this point we have already calculated all move options.
             // We will need them again in determineBirthday, so we might as well pass them along.
-            DyadicRational value((long long) -determineBirthday<Ruleset>(rightMoveOptionIds));
+            DyadicRational value((long long) -determineBirthday<Flavour>(rightMoveOptionIds));
             cache.value = value;
             return value;
         }
         else if (rightMoveOptionIds.empty()) {
             // At this point we have already calculated all move options.
             // We will need them again in determineBirthday, so we might as well pass them along.
-            DyadicRational value((long long) determineBirthday<Ruleset>(leftMoveOptionIds));
+            DyadicRational value((long long) determineBirthday<Flavour>(leftMoveOptionIds));
             cache.value = value;
             return value;
         }
 
         std::vector<DyadicRational> leftValues;
         for (GameInstanceId moveOptionId : leftMoveOptionIds) {
-            std::optional<DyadicRational> leftValue = GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineValue<Ruleset>();
+            std::optional<DyadicRational> leftValue = GameInstanceDatabase<Flavour>::getInstance().getGameInstance(moveOptionId).template determineValue<Flavour>();
             if (!leftValue.has_value()) {
                 cache.isNumber = false;
                 return {};
@@ -139,7 +139,7 @@ public:
 
         std::vector<DyadicRational> rightValues;
         for (GameInstanceId moveOptionId : rightMoveOptionIds) {
-            std::optional<DyadicRational> rightValue = GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineValue<Ruleset>();
+            std::optional<DyadicRational> rightValue = GameInstanceDatabase<Flavour>::getInstance().getGameInstance(moveOptionId).template determineValue<Flavour>();
             if (!rightValue.has_value()) {
                 cache.isNumber = false;
                 return {};
@@ -157,7 +157,7 @@ public:
     virtual ~QuantumHackenbush() = default;
 
 protected:
-    template<typename Ruleset>
+    template<typename Flavour>
     std::vector<GameInstanceId> getSuperposedMoveOptions(Player player) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
         std::vector<typename Realisation::Piece> pieces = superposition.getPieces(player);
 
@@ -175,7 +175,7 @@ protected:
                 }
             }
             if (!option.empty()) {
-                GameInstanceId gameInstanceId = GameInstanceDatabase<Ruleset>::getInstance().getGameInstanceId(Ruleset(option));
+                GameInstanceId gameInstanceId = GameInstanceDatabase<Flavour>::getInstance().getGameInstanceId(Flavour(option));
                 result.emplace_back(gameInstanceId);
             }
         }
@@ -187,7 +187,7 @@ protected:
     mutable GameInstanceCacheBlock cache;
 
 private:
-    template<typename Ruleset>
+    template<typename Flavour>
     OutcomeClass determineOutcomeClass(Player turn) const {
         if (turn == Player::LEFT && cache.leftStartsOutcome.has_value()) return cache.leftStartsOutcome.value();
         else if (turn == Player::RIGHT && cache.rightStartsOutcome.has_value()) return cache.rightStartsOutcome.value();
@@ -196,7 +196,7 @@ private:
         switch (turn) {
             case Player::LEFT:
                 for (GameInstanceId moveOptionId : moveOptionIds) {
-                    OutcomeClass outcome = GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineOutcomeClass<Ruleset>(Player::RIGHT);
+                    OutcomeClass outcome = GameInstanceDatabase<Flavour>::getInstance().getGameInstance(moveOptionId).template determineOutcomeClass<Flavour>(Player::RIGHT);
                     if (outcome == OutcomeClass::L || outcome == OutcomeClass::P) {
                         cache.leftStartsOutcome = OutcomeClass::L;
                         return OutcomeClass::L;
@@ -206,7 +206,7 @@ private:
                 return OutcomeClass::R;
             case Player::RIGHT:
                 for (GameInstanceId moveOptionId : moveOptionIds) {
-                    OutcomeClass outcome = GameInstanceDatabase<Ruleset>::getInstance().getGameInstance(moveOptionId).template determineOutcomeClass<Ruleset>(Player::LEFT);
+                    OutcomeClass outcome = GameInstanceDatabase<Flavour>::getInstance().getGameInstance(moveOptionId).template determineOutcomeClass<Flavour>(Player::LEFT);
                     if (outcome == OutcomeClass::R || outcome == OutcomeClass::P) {
                         cache.rightStartsOutcome = OutcomeClass::R;
                         return OutcomeClass::R;

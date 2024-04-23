@@ -1,5 +1,5 @@
 # Quantum Hackenbush Suite
-Tool that constructs game trees for restricted quantum hackenbush under different rulesets.
+Tool that constructs game trees for restricted quantum hackenbush under different flavours.
 
 ## References
 Parts of this program were inspired by [CGSynch](https://github.com/xlenstra/CGSynch), which is a program for analysing combinatorial and synchronised games.

@@ -27,7 +27,7 @@ bool QuantumHackenbushC<Realisation>::operator==(const QuantumHackenbushC<Realis
 template<typename Realisation>
 std::vector<GameInstanceId> QuantumHackenbushC<Realisation>::getMoveOptions(Player player) const {
     std::vector<typename Realisation::Piece> pieces = this->superposition.getPieces(player);
-    // Ruleset C: unsuperposed moves are allowed if and only if they are valid in all possible realisations
+    // Flavour C: unsuperposed moves are allowed if and only if they are valid in all possible realisations
     std::vector<GameInstanceId> result;
     for (typename Realisation::Piece piece : pieces) {
         Superposition<Realisation> option;

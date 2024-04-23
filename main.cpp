@@ -1,12 +1,12 @@
 #include <iostream>
 
 #include "Util/CreatePositionUtil.h"
-#include "Game/Flavours/SuperpositionClassical.h"
-#include "Game/Flavours/SuperpositionA.h"
-#include "Game/Flavours/SuperpositionB.h"
-#include "Game/Flavours/SuperpositionC.h"
-#include "Game/Flavours/SuperpositionCPrime.h"
-#include "Game/Flavours/SuperpositionD.h"
+#include "Flavours/SuperpositionClassical.h"
+#include "Flavours/SuperpositionA.h"
+#include "Flavours/SuperpositionB.h"
+#include "Flavours/SuperpositionC.h"
+#include "Flavours/SuperpositionCPrime.h"
+#include "Flavours/SuperpositionD.h"
 
 typedef RestrictedPosition Realisation;
 

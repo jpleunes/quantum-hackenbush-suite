@@ -1,7 +1,7 @@
 #ifndef SUPERPOSITION_C_PRIME_H
 #define SUPERPOSITION_C_PRIME_H
 
-#include "../Superposition/Superposition.h"
+#include "Superposition/Superposition.h"
 
 template<typename Realisation>
 class SuperpositionCPrime : public Superposition<Realisation> {

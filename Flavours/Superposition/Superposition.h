@@ -6,7 +6,7 @@
 #include <limits>
 #include <algorithm>
 
-#include "../Position/PositionDatabase.h"
+#include "Position/PositionDatabase.h"
 #include "../../Util/HashUtil.h"
 #include "Generator.h"
 #include "DyadicRational.h"
@@ -26,12 +26,12 @@ typedef size_t SuperpositionId;
 #include "SuperpositionDatabase.h" // This include needs to be here, because it depends on SuperpositionId
 
 struct SuperpositionCacheBlock {
-    std::optional<OutcomeClass> outcome;
-    std::optional<OutcomeClass> leftStartsOutcome;
-    std::optional<OutcomeClass> rightStartsOutcome;
-    std::optional<bool> isNumber;
-    std::optional<DyadicRational> value;
-    std::optional<size_t> birthday;
+    std::optional<OutcomeClass> outcome; // Should be moved to CombinatorialGame
+    std::optional<OutcomeClass> leftStartsOutcome; // Should be moved to CombinatorialGame
+    std::optional<OutcomeClass> rightStartsOutcome; // Should be moved to CombinatorialGame
+    std::optional<bool> isNumber; // Should be moved to CombinatorialGame
+    std::optional<DyadicRational> value; // Should be moved to CombinatorialGame
+    std::optional<size_t> birthday; // Should be moved to CombinatorialGame
 };
 
 /**

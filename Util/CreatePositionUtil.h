@@ -1,8 +1,8 @@
 #ifndef CREATE_POSITION_UTIL_H
 #define CREATE_POSITION_UTIL_H
 
-#include "../Game/Position/AdjacencyMatrixPosition.h"
-#include "../Game/Position/RestrictedPosition.h"
+#include "../Flavours/Superposition/Position/AdjacencyMatrixPosition.h"
+#include "../Flavours/Superposition/Position/RestrictedPosition.h"
 
 // Creates a 1-wide starting superposition for the restricted variant of Hackenbush,
 // represented as an adjacency matrix.

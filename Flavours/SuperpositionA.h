@@ -1,7 +1,7 @@
 #ifndef SUPERPOSITION_A_H
 #define SUPERPOSITION_A_H
 
-#include "../Superposition/Superposition.h"
+#include "Superposition/Superposition.h"
 
 template<typename Realisation>
 class SuperpositionA : public Superposition<Realisation> {

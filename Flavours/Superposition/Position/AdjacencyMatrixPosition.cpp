@@ -2,12 +2,11 @@
 #include <iostream>
 
 #include "AdjacencyMatrixPosition.h"
-#include "PositionDatabase.h"
 
 AdjacencyMatrixPosition::AdjacencyMatrixPosition() : AdjacencyMatrixPosition(0) {
 }
 
-AdjacencyMatrixPosition::AdjacencyMatrixPosition(AdjacencyMatrixPosition const& other) : adjacencyMatrix(other.adjacencyMatrix) { // Do NOT copy the cache
+AdjacencyMatrixPosition::AdjacencyMatrixPosition(AdjacencyMatrixPosition const& other) : adjacencyMatrix(other.adjacencyMatrix) {
 }
 
 AdjacencyMatrixPosition::AdjacencyMatrixPosition(size_t nodeCount) {
@@ -39,10 +38,26 @@ void AdjacencyMatrixPosition::addPiece(Edge piece, PieceColour colour) {
     // TODO: check if this piece is connected to ground?
 }
 
-std::vector<Edge> AdjacencyMatrixPosition::getPieces(Player player) const {
-    if (player == Player::LEFT && cache.leftPieces.has_value()) return cache.leftPieces.value();
-    if (player == Player::RIGHT && cache.rightPieces.has_value()) return cache.rightPieces.value();
+bool AdjacencyMatrixPosition::removePiece(Edge piece) {
+    bool removeSuccessful = false;
+    if (piece.from < piece.to) {
+        if (adjacencyMatrix[piece.to][piece.from] != PieceColour::NONE) removeSuccessful = true;
+        adjacencyMatrix[piece.to][piece.from] = PieceColour::NONE;
+    }
+    else {
+        if (adjacencyMatrix[piece.from][piece.to] != PieceColour::NONE) removeSuccessful = true;
+        adjacencyMatrix[piece.from][piece.to] = PieceColour::NONE;
+    }
+    if (!removeSuccessful) return false;
 
+    // Remove all pieces which are no longer connected to ground
+    removeNotConnectedToGround(piece);
+    // TODO: remove unreachable nodes by resizing matrix (for this we need node id translations)
+
+    return true;
+}
+
+std::set<Edge> AdjacencyMatrixPosition::getPieces(Player player) const {
     PieceColour colour;
     switch (player) {
         case Player::LEFT:
@@ -55,48 +70,15 @@ std::vector<Edge> AdjacencyMatrixPosition::getPieces(Player player) const {
             throw(std::domain_error("Unknown player case."));
     }
 
-    std::vector<Edge> pieces;
+    std::set<Edge> pieces;
     for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
         for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {
             if (adjacencyMatrix[i][j] == colour) {
-                pieces.push_back({ i, j });
+                pieces.insert({ i, j });
             }
         }
     }
-    if (player == Player::LEFT) cache.leftPieces = pieces;
-    if (player == Player::RIGHT) cache.rightPieces = pieces;
     return pieces;
-}
-
-PositionId AdjacencyMatrixPosition::applyMove(Edge piece) const {
-    if (cache.moveOptions.contains(piece)) return cache.moveOptions[piece];
-
-    AdjacencyMatrixPosition result = AdjacencyMatrixPosition(adjacencyMatrix.size());
-    for (size_t i = 0; i < adjacencyMatrix.size(); i++) {
-        for (size_t j = 0; j < adjacencyMatrix[i].size(); j++) {
-            result.adjacencyMatrix[i][j] = adjacencyMatrix[i][j];
-        }
-    }
-
-    bool removeSuccessful = false;
-    if (piece.from < piece.to) {
-        if (adjacencyMatrix[piece.to][piece.from] != PieceColour::NONE) removeSuccessful = true;
-        result.adjacencyMatrix[piece.to][piece.from] = PieceColour::NONE;
-    }
-    else {
-        if (adjacencyMatrix[piece.from][piece.to] != PieceColour::NONE) removeSuccessful = true;
-        result.adjacencyMatrix[piece.from][piece.to] = PieceColour::NONE;
-    }
-    cache.moveOptions[piece] = ILLEGAL_POSITION_ID;
-    if (!removeSuccessful) return ILLEGAL_POSITION_ID;
-
-    // Remove all pieces which are no longer connected to ground
-    result.removeNotConnectedToGround(piece);
-
-    // TODO: remove unreachable nodes by resizing matrix (for this we need node id translations)
-    PositionId id = PositionDatabase<AdjacencyMatrixPosition>::getInstance().getPositionId(result);
-    cache.moveOptions[piece] = id;
-    return id;
 }
 
 void AdjacencyMatrixPosition::removeNotConnectedToGround(Edge removedPiece) {

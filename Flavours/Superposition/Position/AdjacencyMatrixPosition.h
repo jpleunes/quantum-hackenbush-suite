@@ -16,8 +16,8 @@ public:
     bool operator==(const AdjacencyMatrixPosition& other) const;
 
     void addPiece(Edge piece, PieceColour colour) override;
-    std::vector<Edge> getPieces(Player player) const override;
-    PositionId applyMove(Edge piece) const override;
+    bool removePiece(Edge piece) override;
+    std::set<Edge> getPieces(Player player) const override;
     /// @brief Removes all pieces that are no longer connected to the ground.
     /// @param removedPiece piece that was last removed, can be used to stop the breadth-first search earlier
     void removeNotConnectedToGround(Edge removedPiece);

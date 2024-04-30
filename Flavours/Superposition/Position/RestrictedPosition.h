@@ -21,8 +21,8 @@ public:
     bool operator==(const RestrictedPosition& other) const;
 
     void addPiece(RestrictedPiece piece);
-    std::vector<RestrictedPiece> getPieces(Player player) const override;
-    PositionId applyMove(RestrictedPiece piece) const override;
+    bool removePiece(RestrictedPiece piece) override;
+    std::set<RestrictedPiece> getPieces(Player player) const override;
     void printHumanReadable() const override;
 
     ~RestrictedPosition() override = default;

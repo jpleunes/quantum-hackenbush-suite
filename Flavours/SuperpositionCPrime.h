@@ -6,9 +6,9 @@
 template<typename Realisation>
 class SuperpositionCPrime : public Superposition<Realisation> {
 public:
-    SuperpositionCPrime() = default;
-    SuperpositionCPrime(PositionId positionId);
-    std::vector<SuperpositionId> getMoveOptions(Player player) const override;
+    SuperpositionCPrime(HackenbushId positionId, SuperpositionId id);
+    SuperpositionCPrime(std::set<HackenbushId> realisations, SuperpositionId id);
+    std::vector<SuperpositionId> getOptions(Player player) const override;
 
     ~SuperpositionCPrime() override = default;
 };
@@ -16,41 +16,43 @@ public:
 // This is a templated class, so the implementations need to go here
 
 template<typename Realisation>
-SuperpositionCPrime<Realisation>::SuperpositionCPrime(PositionId positionId) : Superposition<Realisation>(positionId) {
+SuperpositionCPrime<Realisation>::SuperpositionCPrime(HackenbushId positionId, SuperpositionId id) : Superposition<Realisation>(positionId, id) {
 };
 
 template<typename Realisation>
-std::vector<SuperpositionId> SuperpositionCPrime<Realisation>::getMoveOptions(Player player) const {
+SuperpositionCPrime<Realisation>::SuperpositionCPrime(std::set<HackenbushId> realisations, SuperpositionId id) : Superposition<Realisation>(realisations, id) {
+}
+
+template<typename Realisation>
+std::vector<SuperpositionId> SuperpositionCPrime<Realisation>::getOptions(Player player) const {
+    if (player == Player::LEFT && this->cache.leftOptions.has_value()) return this->cache.leftOptions.value();
+    else if (player == Player::RIGHT && this->cache.rightOptions.has_value()) return this->cache.rightOptions.value();
+
     std::vector<typename Realisation::Piece> pieces = this->getPieces(player);
     // Flavour C': unsuperposed moves are allowed if and only if they are valid in all possible realisations
-    // where he still has at least one classical move
+    // where they still have at least one classical move
     std::vector<SuperpositionId> result;
     for (typename Realisation::Piece piece : pieces) {
-        SuperpositionCPrime option;
+        std::set<HackenbushId> option;
         bool allValidWithClassicalMove = true;
-        for (PositionId realisationId : this->realisationIds) {
-            Realisation& realisation = PositionDatabase<Realisation>::getInstance().getPosition(realisationId);
+        for (HackenbushId realisationId : this->getRealisations()) {
+            Hackenbush<Realisation> realisation = HackenbushDatabase<Realisation>::getInstance().getPosition(realisationId);
             if (realisation.getPieces(player).empty()) continue;
             
-            PositionId newRealisationId = realisation.applyMove(piece);
-            if (newRealisationId != ILLEGAL_POSITION_ID) option.addRealisationId(newRealisationId);
+            std::optional<HackenbushId> newRealisationId = realisation.applyMove(piece);
+            if (newRealisationId.has_value()) option.insert(newRealisationId.value());
             else allValidWithClassicalMove = false;
         }
-        if (allValidWithClassicalMove && !option.empty()) result.emplace_back(SuperpositionDatabase<SuperpositionCPrime<Realisation>>::getInstance().getSuperpositionId(SuperpositionCPrime<Realisation>(option)));
+        if (allValidWithClassicalMove && !option.empty()) result.emplace_back(SuperpositionDatabase<SuperpositionCPrime<Realisation>>::getInstance().getOrInsert(option).getId());
     }
 
-    std::vector<SuperpositionId> superposedMoveOptions = getSuperposedMoveOptions<SuperpositionCPrime<Realisation>>(player);
-    result.insert(result.end(), superposedMoveOptions.begin(), superposedMoveOptions.end());
+    std::vector<SuperpositionId> superposedOptions = getSuperposedOptions<SuperpositionCPrime<Realisation>>(player);
+    result.insert(result.end(), superposedOptions.begin(), superposedOptions.end());
+
+    if (player == Player::LEFT) this->cache.leftOptions = result;
+    else if (player == Player::RIGHT) this->cache.rightOptions = result;
+
     return result;
 };
-
-namespace std {
-    template<typename Realisation>
-    struct hash<SuperpositionCPrime<Realisation>> {
-        size_t operator()(const SuperpositionCPrime<Realisation>& superposition) const {
-            return std::hash<Superposition<Realisation>>()(superposition);
-        }
-    };
-}
 
 #endif // SUPERPOSITION_C_PRIME_H

@@ -6,9 +6,9 @@
 template<typename Realisation>
 class SuperpositionA : public Superposition<Realisation> {
 public:
-    SuperpositionA() = default;
-    SuperpositionA(PositionId positionId);
-    std::vector<SuperpositionId> getMoveOptions(Player player) const override;
+    SuperpositionA(HackenbushId positionId, SuperpositionId id);
+    SuperpositionA(std::set<HackenbushId> realisations, SuperpositionId id);
+    std::vector<SuperpositionId> getOptions(Player player) const override;
 
     ~SuperpositionA() override = default;
 };
@@ -16,21 +16,24 @@ public:
 // This is a templated class, so the implementations need to go here
 
 template<typename Realisation>
-SuperpositionA<Realisation>::SuperpositionA(PositionId positionId) : Superposition<Realisation>(positionId) {
+SuperpositionA<Realisation>::SuperpositionA(HackenbushId positionId, SuperpositionId id) : Superposition<Realisation>(positionId, id) {
 };
 
 template<typename Realisation>
-std::vector<SuperpositionId> SuperpositionA<Realisation>::getMoveOptions(Player player) const {
-    return getSuperposedMoveOptions<SuperpositionA<Realisation>>(player);
-};
-
-namespace std {
-    template<typename Realisation>
-    struct hash<SuperpositionA<Realisation>> {
-        size_t operator()(const SuperpositionA<Realisation>& superposition) const {
-            return std::hash<Superposition<Realisation>>()(superposition);
-        }
-    };
+SuperpositionA<Realisation>::SuperpositionA(std::set<HackenbushId> realisations, SuperpositionId id) : Superposition<Realisation>(realisations, id) {
 }
+
+template<typename Realisation>
+std::vector<SuperpositionId> SuperpositionA<Realisation>::getOptions(Player player) const {
+    if (player == Player::LEFT && this->cache.leftOptions.has_value()) return this->cache.leftOptions.value();
+    else if (player == Player::RIGHT && this->cache.rightOptions.has_value()) return this->cache.rightOptions.value();
+    
+    std::vector<SuperpositionId> result = getSuperposedOptions<SuperpositionA<Realisation>>(player);
+
+    if (player == Player::LEFT) this->cache.leftOptions = result;
+    else if (player == Player::RIGHT) this->cache.rightOptions = result;
+
+    return result;
+};
 
 #endif // SUPERPOSITION_A_H

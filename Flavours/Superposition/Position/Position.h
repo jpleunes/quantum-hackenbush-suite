@@ -1,12 +1,11 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include <vector>
+#include <set>
 #include <cstddef>
 #include <memory>
 #include <map>
 #include <optional>
-#include <limits>
 
 enum class PieceColour : char {
 	BLUE = 1,
@@ -39,30 +38,15 @@ struct RestrictedPiece {
     }
 };
 
-typedef size_t PositionId;
-#define ILLEGAL_POSITION_ID std::numeric_limits<PositionId>::max()
-
-template<typename Piece>
-struct PositionCacheBlock {
-    std::optional<std::vector<Piece>> leftPieces;
-    std::optional<std::vector<Piece>> rightPieces;
-    std::map<Piece, PositionId> moveOptions;
-};
-
 template<typename Piece>
 class Position {
 public:
-    virtual std::vector<Piece> getPieces(Player player) const = 0;    
-    /// @brief Constructs a new Position representing the result of applying the given move.
-    /// @param piece the piece to remove
-    /// @return the resulting Position, or nullptr if the move was illegal
-    virtual PositionId applyMove(Piece piece) const = 0;
+    virtual bool removePiece(Piece piece) = 0;
+    virtual std::set<Piece> getPieces(Player player) const = 0;
+    
     virtual void printHumanReadable() const = 0;
 
     virtual ~Position() = default;
-
-protected:
-    mutable PositionCacheBlock<Piece> cache;
 };
 
 #endif // POSITION_H

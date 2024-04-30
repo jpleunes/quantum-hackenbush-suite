@@ -6,32 +6,21 @@
 #include <limits>
 #include <algorithm>
 
-#include "Position/PositionDatabase.h"
+#include "../../CombinatorialGame/ShortGame.h"
+#include "Position/HackenbushDatabase.h"
 #include "../../Util/HashUtil.h"
 #include "Generator.h"
-#include "DyadicRational.h"
 
 const int width = 2;
 
-enum class OutcomeClass {
-    L,
-    R,
-    N,
-    P,
-};
-
 typedef size_t SuperpositionId;
-#define ILLEGAL_SUPERPOSITION_ID std::numeric_limits<SuperpositionId>::max()
 
 #include "SuperpositionDatabase.h" // This include needs to be here, because it depends on SuperpositionId
 
-struct SuperpositionCacheBlock {
-    std::optional<OutcomeClass> outcome; // Should be moved to CombinatorialGame
-    std::optional<OutcomeClass> leftStartsOutcome; // Should be moved to CombinatorialGame
-    std::optional<OutcomeClass> rightStartsOutcome; // Should be moved to CombinatorialGame
-    std::optional<bool> isNumber; // Should be moved to CombinatorialGame
-    std::optional<DyadicRational> value; // Should be moved to CombinatorialGame
-    std::optional<size_t> birthday; // Should be moved to CombinatorialGame
+struct SuperpositionCache {
+    std::optional<std::vector<SuperpositionId>> leftOptions, rightOptions;
+    std::optional<ShortGameId> shortGameId;
+    // TODO: displayString
 };
 
 /**
@@ -40,136 +29,52 @@ struct SuperpositionCacheBlock {
 template<typename Realisation>
 class Superposition {
 public:
-    std::set<PositionId> realisationIds;
+    // This constructor should only be used from within SuperpositionDatabase.
+    // Otherwise, SuperpositionDatabase.getOrInsert should be used.
+    Superposition(HackenbushId classicalPosition, SuperpositionId id);
+    // This constructor should only be used from within SuperpositionDatabase.
+    // Otherwise, SuperpositionDatabase.getOrInsert should be used.
+    Superposition(std::set<HackenbushId> realisations, SuperpositionId id);
 
-    Superposition() = default;
-    Superposition(PositionId classicalPositionId);
-    bool operator==(const Superposition<Realisation>& other) const { return realisationIds == other.realisationIds; }
-    bool empty() const;
-    void addRealisationId(PositionId realisationId);
+    const std::set<HackenbushId>& getRealisations() const { return realisations; }
+    SuperpositionId getId() const { return id; }
+    // Checks whether two superpositions have equal realisations sets.
+    bool operator==(const Superposition<Realisation>& other) const {
+        // Superpositions with equal realisations sets are assigned the same id.
+        // Two realisations are considered equal if the repersentations of the positions are equal.
+        // Note that equality of position representanions implies label-isomorphism.
+        return id == other.id;
+    }
     // Gets the pieces which exist in at least one realisation (and can thus be used in a move) 
     // for a given player.
     std::vector<typename Realisation::Piece> getPieces(Player player) const;
 
-    virtual std::vector<SuperpositionId> getMoveOptions(Player player) const = 0;
+    virtual std::vector<SuperpositionId> getOptions(Player player) const = 0;
 
+    // Inspired by Xander Lenstra https://github.com/xlenstra/CGSynch.
     template<typename Flavour>
-    OutcomeClass determineOutcomeClass() const {
-        if (cache.outcome.has_value()) return cache.outcome.value();
+    ShortGameId determineShortGameId() const {
+        if (cache.shortGameId.has_value()) return cache.shortGameId.value();
 
-        auto leftStartOutcome = determineOutcomeClass<Flavour>(Player::LEFT);
-        auto rightStartOutcome = determineOutcomeClass<Flavour>(Player::RIGHT);
+        std::set<ShortGameId> leftOptions, rightOptions;
+        for (SuperpositionId leftOption : getOptions(Player::LEFT)) {
+            leftOptions.insert(SuperpositionDatabase<Flavour>::getInstance().getSuperposition(leftOption).template determineShortGameId<Flavour>());
+        }
+        for (SuperpositionId rightOption : getOptions(Player::RIGHT)) {
+            rightOptions.insert(SuperpositionDatabase<Flavour>::getInstance().getSuperposition(rightOption).template determineShortGameId<Flavour>());
+        }
+        ShortGameId result = ShortGameDatabase::getInstance().getOrInsert(leftOptions, rightOptions).getId();
 
-        bool leftHasWinningMove = leftStartOutcome == OutcomeClass::L || leftStartOutcome == OutcomeClass::P;
-        bool rightHasWinningMove = rightStartOutcome == OutcomeClass::R || rightStartOutcome == OutcomeClass::P;
-        if (leftHasWinningMove && rightHasWinningMove) {
-            cache.outcome = OutcomeClass::N;
-            return OutcomeClass::N;
-        }
-        if (leftHasWinningMove) {
-            cache.outcome = OutcomeClass::L;
-            return OutcomeClass::L;
-        }
-        else if (rightHasWinningMove) {
-            cache.outcome = OutcomeClass::R;
-            return OutcomeClass::R;
-        }
-        else {
-            cache.outcome = OutcomeClass::P;
-            return OutcomeClass::P;
-        }
-    }
+        cache.shortGameId = result;
 
-    template<typename Flavour>
-    size_t determineBirthday(const std::vector<SuperpositionId>& moveOptionIds) const {
-        if (cache.birthday.has_value()) return cache.birthday.value();
-        size_t birthday = 0;
-        if (!moveOptionIds.empty()) {
-            for (SuperpositionId moveOptionId : moveOptionIds)
-                birthday = std::max(birthday, SuperpositionDatabase<Flavour>::getInstance().getSuperposition(moveOptionId).template determineBirthday<Flavour>());
-        }
-        else {
-            std::vector<SuperpositionId> leftMoveOptionIds = getMoveOptions(Player::LEFT);
-            std::vector<SuperpositionId> rightMoveOptionIds = getMoveOptions(Player::RIGHT);
-            if (leftMoveOptionIds.empty() && rightMoveOptionIds.empty()) {
-                cache.birthday = 0;
-                return 0;
-            }
-            for (SuperpositionId moveOptionId : leftMoveOptionIds)
-                birthday = std::max(birthday, SuperpositionDatabase<Flavour>::getInstance().getSuperposition(moveOptionId).template determineBirthday<Flavour>());
-            for (SuperpositionId moveOptionId : rightMoveOptionIds)
-                birthday = std::max(birthday, SuperpositionDatabase<Flavour>::getInstance().getSuperposition(moveOptionId).template determineBirthday<Flavour>());
-        }
-        birthday += 1;
-        cache.birthday = birthday;
-        return birthday;
-    }
-
-    template<typename Flavour>
-    size_t determineBirthday() const {        
-        return determineBirthday<Flavour>(std::vector<SuperpositionId>());
-    }
-
-    template<typename Flavour>
-    std::optional<DyadicRational> determineValue() const {
-        if (cache.isNumber.has_value() && !cache.isNumber.value()) return {};
-        if (cache.value.has_value()) return cache.value.value();
-
-        std::vector<SuperpositionId> leftMoveOptionIds = getMoveOptions(Player::LEFT);
-        std::vector<SuperpositionId> rightMoveOptionIds = getMoveOptions(Player::RIGHT);
-        if (leftMoveOptionIds.empty() && rightMoveOptionIds.empty()) {
-            DyadicRational value(0);
-            cache.value = value;
-            return value;
-        }
-        else if (leftMoveOptionIds.empty()) {
-            // At this point we have already calculated all move options.
-            // We will need them again in determineBirthday, so we might as well pass them along.
-            DyadicRational value((long long) -determineBirthday<Flavour>(rightMoveOptionIds));
-            cache.value = value;
-            return value;
-        }
-        else if (rightMoveOptionIds.empty()) {
-            // At this point we have already calculated all move options.
-            // We will need them again in determineBirthday, so we might as well pass them along.
-            DyadicRational value((long long) determineBirthday<Flavour>(leftMoveOptionIds));
-            cache.value = value;
-            return value;
-        }
-
-        std::vector<DyadicRational> leftValues;
-        for (SuperpositionId moveOptionId : leftMoveOptionIds) {
-            std::optional<DyadicRational> leftValue = SuperpositionDatabase<Flavour>::getInstance().getSuperposition(moveOptionId).template determineValue<Flavour>();
-            if (!leftValue.has_value()) {
-                cache.isNumber = false;
-                return {};
-            }
-            leftValues.emplace_back(leftValue.value());
-        }
-        DyadicRational bestLeftValue = *std::max_element(leftValues.begin(), leftValues.end());
-
-        std::vector<DyadicRational> rightValues;
-        for (SuperpositionId moveOptionId : rightMoveOptionIds) {
-            std::optional<DyadicRational> rightValue = SuperpositionDatabase<Flavour>::getInstance().getSuperposition(moveOptionId).template determineValue<Flavour>();
-            if (!rightValue.has_value()) {
-                cache.isNumber = false;
-                return {};
-            }
-            rightValues.emplace_back(rightValue.value());
-        }
-        DyadicRational bestRightValue = *std::min_element(rightValues.begin(), rightValues.end());
-
-        std::optional<DyadicRational> value = getSimplestNumber(bestLeftValue, bestRightValue);
-        cache.isNumber = value.has_value();
-        cache.value = value;
-        return value;
+        return result;
     }
 
     virtual ~Superposition() = default;
 
 protected:
     template<typename Flavour>
-    std::vector<SuperpositionId> getSuperposedMoveOptions(Player player) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
+    std::vector<SuperpositionId> getSuperposedOptions(Player player) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
         std::vector<typename Realisation::Piece> pieces = getPieces(player);
 
         std::vector<SuperpositionId> result;
@@ -177,56 +82,27 @@ protected:
         auto indexCombinationsGen = indexCombinations(pieces.size());
         while (indexCombinationsGen) {
             std::vector<size_t> move = indexCombinationsGen();
-            Flavour option;
-            for (PositionId realisationId : realisationIds) {
+            std::set<HackenbushId> option;
+            for (HackenbushId realisationId : realisations) {
                 for (size_t pieceIndex : move) {
-                    Realisation& realisation = PositionDatabase<Realisation>::getInstance().getPosition(realisationId);
-                    PositionId newRealisationId = realisation.applyMove(pieces[pieceIndex]);
-                    if (newRealisationId != ILLEGAL_POSITION_ID) option.addRealisationId(newRealisationId);
+                    Hackenbush<Realisation> realisation = HackenbushDatabase<Realisation>::getInstance().getPosition(realisationId);
+                    std::optional<HackenbushId> newRealisationId = realisation.applyMove(pieces[pieceIndex]);
+                    if (newRealisationId.has_value()) option.insert(newRealisationId.value());
                 }
             }
             if (!option.empty()) {
-                SuperpositionId superpositionId = SuperpositionDatabase<Flavour>::getInstance().getSuperpositionId(option);
+                SuperpositionId superpositionId = SuperpositionDatabase<Flavour>::getInstance().getOrInsert(option).getId();
                 result.emplace_back(superpositionId);
             }
         }
         return result;
     }
 
-    mutable SuperpositionCacheBlock cache;
+    mutable SuperpositionCache cache;
     
 private:
-    template<typename Flavour>
-    OutcomeClass determineOutcomeClass(Player turn) const {
-        if (turn == Player::LEFT && cache.leftStartsOutcome.has_value()) return cache.leftStartsOutcome.value();
-        else if (turn == Player::RIGHT && cache.rightStartsOutcome.has_value()) return cache.rightStartsOutcome.value();
-
-        std::vector<SuperpositionId> moveOptionIds = getMoveOptions(turn);
-        switch (turn) {
-            case Player::LEFT:
-                for (SuperpositionId moveOptionId : moveOptionIds) {
-                    OutcomeClass outcome = SuperpositionDatabase<Flavour>::getInstance().getSuperposition(moveOptionId).template determineOutcomeClass<Flavour>(Player::RIGHT);
-                    if (outcome == OutcomeClass::L || outcome == OutcomeClass::P) {
-                        cache.leftStartsOutcome = OutcomeClass::L;
-                        return OutcomeClass::L;
-                    }
-                }
-                cache.leftStartsOutcome = OutcomeClass::R;
-                return OutcomeClass::R;
-            case Player::RIGHT:
-                for (SuperpositionId moveOptionId : moveOptionIds) {
-                    OutcomeClass outcome = SuperpositionDatabase<Flavour>::getInstance().getSuperposition(moveOptionId).template determineOutcomeClass<Flavour>(Player::LEFT);
-                    if (outcome == OutcomeClass::R || outcome == OutcomeClass::P) {
-                        cache.rightStartsOutcome = OutcomeClass::R;
-                        return OutcomeClass::R;
-                    }
-                }
-                cache.rightStartsOutcome = OutcomeClass::L;
-                return OutcomeClass::L;
-            default:
-                throw(std::domain_error("Unknown player case."));
-        }
-    }
+    const std::set<HackenbushId> realisations;
+    const SuperpositionId id;
 
     /// @brief TODO
     /// @param n 
@@ -255,39 +131,23 @@ private:
 // This is a templated class, so the implementations need to go here
 
 template<typename Realisation>
-Superposition<Realisation>::Superposition(PositionId classicalPositionId) : realisationIds({classicalPositionId}) {
+Superposition<Realisation>::Superposition(HackenbushId classicalPosition, SuperpositionId id) : realisations({classicalPosition}), id(id) {
 }
 
 template<typename Realisation>
-bool Superposition<Realisation>::empty() const {
-    return realisationIds.empty();
-}
-
-template<typename Realisation>
-void Superposition<Realisation>::addRealisationId(PositionId realisationId) {
-    realisationIds.emplace(realisationId);
+Superposition<Realisation>::Superposition(std::set<HackenbushId> realisations, SuperpositionId id) : realisations(realisations), id(id) {
+    if (realisations.empty()) throw(std::domain_error("Cannot construct empty superposition."));
 }
 
 template<typename Realisation>
 std::vector<typename Realisation::Piece> Superposition<Realisation>::getPieces(Player player) const {
     std::set<typename Realisation::Piece> pieces;
-    for (PositionId realisationId : realisationIds) {
-        for (typename Realisation::Piece piece : PositionDatabase<Realisation>::getInstance().getPosition(realisationId).getPieces(player)) {
+    for (HackenbushId realisationId : realisations) {
+        for (typename Realisation::Piece piece : HackenbushDatabase<Realisation>::getInstance().getPosition(realisationId).getPieces(player)) {
             pieces.insert(piece);
         }
     }
     return std::vector<typename Realisation::Piece>(pieces.begin(), pieces.end());
-}
-
-namespace std {
-    template<typename Realisation>
-    struct hash<Superposition<Realisation>> {
-        size_t operator()(const Superposition<Realisation>& superposition) const {
-            std::vector<uint32_t> intVec;
-            for (PositionId realisationId : superposition.realisationIds) intVec.push_back((uint32_t) realisationId);
-            return std::hash<std::vector<uint32_t>>()(intVec);
-        }
-    };
 }
 
 #endif // SUPERPOSITION_H

@@ -2,12 +2,11 @@
 #include <iostream>
 
 #include "RestrictedPosition.h"
-#include "PositionDatabase.h"
 
 RestrictedPosition::RestrictedPosition() : entries() {
 }
 
-RestrictedPosition::RestrictedPosition(const RestrictedPosition& other) : entries(other.entries) { // Do NOT copy the cache
+RestrictedPosition::RestrictedPosition(const RestrictedPosition& other) : entries(other.entries) {
 }
 
 bool RestrictedPosition::operator==(const RestrictedPosition& other) const {
@@ -47,58 +46,47 @@ void RestrictedPosition::addPiece(RestrictedPiece piece) {
     }
 }
 
-std::vector<RestrictedPiece> RestrictedPosition::getPieces(Player player) const {
-    if (player == Player::LEFT && cache.leftPieces.has_value()) return cache.leftPieces.value();
-    if (player == Player::RIGHT && cache.rightPieces.has_value()) return cache.rightPieces.value();
-
-    std::vector<RestrictedPiece> result;
+std::set<RestrictedPiece> RestrictedPosition::getPieces(Player player) const {
+    std::set<RestrictedPiece> result;
     for (size_t index = 0; index < entries.size(); index++) {
         HalfOrWhole entry = entries[index];
         if (player == Player::LEFT && (entry == HalfOrWhole::BLUE_HALF || entry == HalfOrWhole::RED_HALF || entry == HalfOrWhole::BLUE_WHOLE))
-            result.push_back(RestrictedPiece(index, PieceColour::BLUE));
+            result.insert(RestrictedPiece(index, PieceColour::BLUE));
         else if (player == Player::RIGHT && (entry == HalfOrWhole::BLUE_HALF || entry == HalfOrWhole::RED_HALF || entry == HalfOrWhole::RED_WHOLE))
-            result.push_back(RestrictedPiece(index, PieceColour::RED));
+            result.insert(RestrictedPiece(index, PieceColour::RED));
     }
-    if (player == Player::LEFT) cache.leftPieces = result;
-    if (player == Player::RIGHT) cache.rightPieces = result;
     return result;
 }
 
-PositionId RestrictedPosition::applyMove(RestrictedPiece piece) const {
-    if (cache.moveOptions.contains(piece)) return cache.moveOptions[piece];
-
-    RestrictedPosition result = RestrictedPosition(*this);
-
+bool RestrictedPosition::removePiece(RestrictedPiece piece) {
     HalfOrWhole entry = entries[piece.index];
     switch (piece.colour) {
         case PieceColour::BLUE: 
             if (entry == HalfOrWhole::BLUE_HALF || entry == HalfOrWhole::BLUE_WHOLE) {
-                result.entries[piece.index] = HalfOrWhole::NONE;
+                entries[piece.index] = HalfOrWhole::NONE;
                 break;
             }
             else if (entry == HalfOrWhole::RED_HALF) {
-                result.entries[piece.index] = HalfOrWhole::RED_WHOLE;
+                entries[piece.index] = HalfOrWhole::RED_WHOLE;
                 break;
             }
-            cache.moveOptions[piece] = ILLEGAL_POSITION_ID;
-            return ILLEGAL_POSITION_ID;
+
+            return false;
        case PieceColour::RED: 
             if (entry == HalfOrWhole::RED_HALF || entry == HalfOrWhole::RED_WHOLE) {
-                result.entries[piece.index] = HalfOrWhole::NONE;
+                entries[piece.index] = HalfOrWhole::NONE;
                 break;
             }
             else if (entry == HalfOrWhole::BLUE_HALF) {
-                result.entries[piece.index] = HalfOrWhole::BLUE_WHOLE;
+                entries[piece.index] = HalfOrWhole::BLUE_WHOLE;
                 break;
             }
-            cache.moveOptions[piece] = ILLEGAL_POSITION_ID;
-            return ILLEGAL_POSITION_ID;
+
+            return false;
         default:
             throw(std::domain_error("Unsupported colour case."));
     }
-    PositionId id = PositionDatabase<RestrictedPosition>::getInstance().getPositionId(result);
-    cache.moveOptions[piece] = id;
-    return id;
+    return true;
 }
 
 void RestrictedPosition::printHumanReadable() const {

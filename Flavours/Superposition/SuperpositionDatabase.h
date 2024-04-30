@@ -7,9 +7,22 @@
 
 #include "Superposition.h"
 
-// TODO: move into templated generic Database class
+namespace std {
+    template<>
+    struct hash<std::set<HackenbushId>> {
+        size_t operator()(const std::set<HackenbushId> realisations) const {
+            std::vector<uint32_t> intVec;
+            for (HackenbushId realisationId : realisations) intVec.push_back((uint32_t) realisationId);
+            return std::hash<std::vector<uint32_t>>()(intVec);
+        }
+    };
+}
+
 /**
- * TODO
+ * A database for keeping track of all unique superpositions of some flavour that we have
+ * encountered so far. Superpositions are considered to be the same if they have label-isomorphic
+ * realisations.
+ * Inspired by Xander Lenstra https://github.com/xlenstra/CGSynch.
  */
 template<typename Flavour>
 class SuperpositionDatabase {
@@ -18,18 +31,23 @@ public:
     SuperpositionDatabase(const SuperpositionDatabase& other) = delete;
 
     /**
-     * Gets the id corresponding to the superposition from the database.
+     * Gets the superposition corresponding to the given classical position from the database.
      * Inserts the superposition if it did not yet exist in the database.
      */
-    SuperpositionId getSuperpositionId(const Flavour& superposition);
+    Flavour& getOrInsert(HackenbushId classicalPosition);
+    /**
+     * Gets the superposition with the given realisations from the database.
+     * Inserts the superposition if it did not yet exist in the database.
+     */
+    Flavour& getOrInsert(const std::set<HackenbushId> realisations);
     /**
      * Gets the superposition with the given id from the database.
      */
-    Flavour& getSuperposition(SuperpositionId id);
+    Flavour& getSuperposition(SuperpositionId id) { return *existingSuperpositions[id]; }
 private:
     SuperpositionDatabase();
     std::vector<std::unique_ptr<Flavour>> existingSuperpositions;
-    std::unordered_map<Flavour, SuperpositionId> superpositionToId;
+    std::unordered_map<std::set<HackenbushId>, SuperpositionId> realisationsToId;
 
     inline static SuperpositionDatabase<Flavour> instance = SuperpositionDatabase<Flavour>();
 };
@@ -38,23 +56,22 @@ private:
 
 template<typename Flavour>
 SuperpositionDatabase<Flavour>::SuperpositionDatabase() {
-    // existingSuperpositions.emplace_back(std::make_unique<Flavour>()); // TODO: do we want to place the empty superposition here?
     existingSuperpositions.reserve(1024);
 }
 
 template<typename Flavour>
-SuperpositionId SuperpositionDatabase<Flavour>::getSuperpositionId(const Flavour& superposition) {
-    if (superpositionToId.contains(superposition)) return superpositionToId[superposition];
-
-    SuperpositionId id = existingSuperpositions.size();
-    superpositionToId[superposition] = id;
-    existingSuperpositions.push_back(std::make_unique<Flavour>(superposition));
-    return id;
+Flavour& SuperpositionDatabase<Flavour>::getOrInsert(HackenbushId classicalPosition) {
+    return getOrInsert(std::set<HackenbushId>{ classicalPosition });
 }
 
 template<typename Flavour>
-Flavour& SuperpositionDatabase<Flavour>::getSuperposition(SuperpositionId id) {
-    return *existingSuperpositions[id];
+Flavour& SuperpositionDatabase<Flavour>::getOrInsert(const std::set<HackenbushId> realisations) {
+    if (realisationsToId.contains(realisations)) return getSuperposition(realisationsToId[realisations]);
+
+    SuperpositionId id = existingSuperpositions.size();
+    realisationsToId[realisations] = id;
+    existingSuperpositions.push_back(std::make_unique<Flavour>(realisations, id));
+    return getSuperposition(id);
 }
 
 #endif // GAME_INSTANCE_DATABASE_H

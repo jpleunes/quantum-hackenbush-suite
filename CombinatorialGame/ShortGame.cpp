@@ -265,10 +265,10 @@ ShortGame& ShortGame::determineCanonicalForm() const {
 
     // Check if the simplest number theorem can be applied
     // TODO: is it more efficient to do this before applying reversibility?
-    if (resultLeftOptions.size() == 1 && resultRightOptions.size() == 1 && ShortGameDatabase::getInstance().getGame(*resultLeftOptions.begin()).isNumber() && ShortGameDatabase::getInstance().getGame(*resultRightOptions.begin()).isNumber()) {
+    if (resultLeftOptions.size() == 1 && resultRightOptions.size() == 1 && ShortGameDatabase::getInstance().getGame(*resultLeftOptions.begin()).isCanonicalNumber() && ShortGameDatabase::getInstance().getGame(*resultRightOptions.begin()).isCanonicalNumber()) {
         DyadicRational leftNumber = ShortGameDatabase::getInstance().getGame(*resultLeftOptions.begin()).determineNumberValue().value();
         DyadicRational rightNumber = ShortGameDatabase::getInstance().getGame(*resultRightOptions.begin()).determineNumberValue().value();
-        std::optional<DyadicRational> number = determineSimplestNumber(leftNumber, rightNumber);
+        std::optional<DyadicRational> number = determineCanonicalNumberValue(leftNumber, rightNumber);
         if (number.has_value()) {
             ShortGame& result = ShortGameDatabase::getInstance().getOrInsert(number.value());
 
@@ -306,7 +306,7 @@ bool ShortGame::isCanonicalInteger() const {
 }
 
 // Inspired by Xander Lenstra https://github.com/xlenstra/CGSynch.
-bool ShortGame::isNumber() const {
+bool ShortGame::isCanonicalNumber() const {
     if (cache.isNumber.has_value()) return cache.isNumber.value();
 
     if (isCanonicalInteger()) {
@@ -315,7 +315,7 @@ bool ShortGame::isNumber() const {
         return true;
     }
     if (!isInCanonicalForm()) {
-        bool result = determineCanonicalForm().isNumber();
+        bool result = determineCanonicalForm().isCanonicalNumber();
 
         cache.isNumber = result;
 
@@ -330,7 +330,7 @@ bool ShortGame::isNumber() const {
     }
     ShortGame& left = ShortGameDatabase::getInstance().getGame(*leftOptions.begin());
     ShortGame& right = ShortGameDatabase::getInstance().getGame(*rightOptions.begin());
-    if (!left.isNumber() || !right.isNumber()) {
+    if (!left.isCanonicalNumber() || !right.isCanonicalNumber()) {
         cache.isNumber = false;
         return false;
     }
@@ -345,7 +345,7 @@ bool ShortGame::isNumber() const {
 std::optional<DyadicRational> ShortGame::determineNumberValue() const {
     if (cache.numberValue.has_value()) return cache.numberValue.value();
 
-    if (!isNumber()) {
+    if (!isCanonicalNumber()) {
         return {};
     }
     if (!isInCanonicalForm()) {
@@ -373,7 +373,7 @@ std::optional<DyadicRational> ShortGame::determineNumberValue() const {
     }
     DyadicRational leftNumber = ShortGameDatabase::getInstance().getGame(*leftOptions.begin()).determineNumberValue().value();
     DyadicRational rightNumber = ShortGameDatabase::getInstance().getGame(*rightOptions.begin()).determineNumberValue().value();
-    DyadicRational result = determineSimplestNumber(leftNumber, rightNumber).value();
+    DyadicRational result = determineCanonicalNumberValue(leftNumber, rightNumber).value();
 
     cache.numberValue = result;
 

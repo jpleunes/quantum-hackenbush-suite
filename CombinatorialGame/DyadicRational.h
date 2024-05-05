@@ -23,7 +23,10 @@ public:
     std::strong_ordering operator<=>(const DyadicRational& other) const;
 };
 
-std::optional<DyadicRational> determineSimplestNumber(const DyadicRational& left, const DyadicRational& right);
+/**
+ * Determines the value of a game that is in the form of a canonical dyadic rational.
+ */
+std::optional<DyadicRational> determineCanonicalNumberValue(const DyadicRational& left, const DyadicRational& right);
 
 std::ostream& operator<<(std::ostream& os, const DyadicRational& number);
 

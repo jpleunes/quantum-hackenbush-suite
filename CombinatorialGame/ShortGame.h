@@ -64,8 +64,8 @@ public:
     bool isInCanonicalForm() const;
     // Determines the canonical form of this game.
     ShortGame& determineCanonicalForm() const;
-    // Determines whether this game is a number.
-    bool isNumber() const;
+    // Determines whether this game is in canonical form and a number.
+    bool isCanonicalNumber() const;
     // Determines the number value of this game.
     std::optional<DyadicRational> determineNumberValue() const;
 

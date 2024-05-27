@@ -2,7 +2,7 @@
 #define RESTRICTED_POSITION_H
 
 #include "Position.h"
-#include "../../../Util/HashUtil.h"
+#include "../../../../Util/HashUtil.h"
 
 enum class HalfOrWhole : char {
     BLUE_HALF,

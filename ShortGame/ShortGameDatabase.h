@@ -1,5 +1,5 @@
-#ifndef SHORT_GAME_DATABASE
-#define SHORT_GAME_DATABASE
+#ifndef SHORT_GAME_DATABASE_H
+#define SHORT_GAME_DATABASE_H
 
 #include <vector>
 #include <memory>
@@ -53,4 +53,4 @@ private:
 // Prevent recursive dependence
 #include "ShortGame.h"
 
-#endif // SHORT_GAME_DATABASE
+#endif // SHORT_GAME_DATABASE_H

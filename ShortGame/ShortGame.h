@@ -1,5 +1,5 @@
-#ifndef COMBINATORIAL_GAME_H
-#define COMBINATORIAL_GAME_H
+#ifndef SHORT_GAME_H
+#define SHORT_GAME_H
 
 #include <set>
 #include <optional>
@@ -57,7 +57,7 @@ public:
 
     // TODO: getDisplayString
     // Determines the outcome class of this game.
-    OutcomeClass determineOutcomeClass() const; // TODO: add Superposition.efficientlyDetermineOutcomeClass function that alternates the player turns
+    OutcomeClass determineOutcomeClass() const; // TODO: add SuperposedGameState.efficientlyDetermineOutcomeClass function that alternates the player turns
     // Determines the birthday of this game.
     size_t determineBirthday() const;
     // Determines whether this game is in canonical form.
@@ -80,4 +80,4 @@ private:
     bool isCanonicalInteger() const;
 };
 
-#endif // COMBINATORIAL_GAME_H
+#endif // SHORT_GAME_H

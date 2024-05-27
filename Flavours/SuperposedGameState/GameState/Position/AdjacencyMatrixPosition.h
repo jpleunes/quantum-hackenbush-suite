@@ -4,7 +4,7 @@
 #include <boost/container_hash/hash.hpp>
 
 #include "GraphPosition.h"
-#include "../../../Util/HashUtil.h"
+#include "../../../../Util/HashUtil.h"
 
 class AdjacencyMatrixPosition : public GraphPosition {
 public:

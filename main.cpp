@@ -1,22 +1,22 @@
 #include <iostream>
 
-#include "Flavours/Superposition/Position/Hackenbush.h"
-#include "Flavours/Superposition/Superposition.h"
+#include "Flavours/SuperposedGameState/GameState/GameState.h"
+#include "Flavours/SuperposedGameState/SuperposedGameState.h"
 #include "Util/CreatePositionUtil.h"
-#include "Flavours/SuperpositionClassical.h"
-#include "Flavours/SuperpositionA.h"
-#include "Flavours/SuperpositionB.h"
-#include "Flavours/SuperpositionC.h"
-#include "Flavours/SuperpositionCPrime.h"
-#include "Flavours/SuperpositionD.h"
+#include "Flavours/SuperposedGameStateClassical.h"
+#include "Flavours/SuperposedGameStateA.h"
+#include "Flavours/SuperposedGameStateB.h"
+#include "Flavours/SuperposedGameStateC.h"
+#include "Flavours/SuperposedGameStateCPrime.h"
+#include "Flavours/SuperposedGameStateD.h"
 
 typedef RestrictedPosition Realisation;
 
 template<typename Flavour>
 void analyse(std::string function, const Realisation& start) {
-    Hackenbush<Realisation> startHackenbush = HackenbushDatabase<Realisation>::getInstance().getOrInsert(start);
-    Flavour startSuperposition = SuperpositionDatabase<Flavour>::getInstance().getOrInsert(startHackenbush.getId());
-    ShortGame& shortGame = ShortGameDatabase::getInstance().getGame(startSuperposition.template determineShortGameId<Flavour>());
+    GameState<Realisation> startGameState = GameStateDatabase<Realisation>::getInstance().getOrInsert(start);
+    Flavour startSuperposedGameState = SuperposedGameStateDatabase<Flavour>::getInstance().getOrInsert(startGameState.getId());
+    ShortGame& shortGame = ShortGameDatabase::getInstance().getGame(startSuperposedGameState.template determineShortGameId<Flavour>());
 
     if (function == "outcome") {
         OutcomeClass outcome = shortGame.determineOutcomeClass();
@@ -67,12 +67,12 @@ int main(int argc, char **argv) {
     start->printHumanReadable();
     #endif
 
-    if (flavour == "classical") analyse<SuperpositionClassical<Realisation>>(function, start);
-    else if (flavour == "a") analyse<SuperpositionA<Realisation>>(function, start);
-    else if (flavour == "b") analyse<SuperpositionB<Realisation>>(function, start);
-    else if (flavour == "c") analyse<SuperpositionC<Realisation>>(function, start);
-    else if (flavour == "cprime") analyse<SuperpositionCPrime<Realisation>>(function, start);
-    else if (flavour == "d") analyse<SuperpositionD<Realisation>>(function, start);
+    if (flavour == "classical") analyse<SuperposedGameStateClassical<Realisation>>(function, start);
+    else if (flavour == "a") analyse<SuperposedGameStateA<Realisation>>(function, start);
+    else if (flavour == "b") analyse<SuperposedGameStateB<Realisation>>(function, start);
+    else if (flavour == "c") analyse<SuperposedGameStateC<Realisation>>(function, start);
+    else if (flavour == "cprime") analyse<SuperposedGameStateCPrime<Realisation>>(function, start);
+    else if (flavour == "d") analyse<SuperposedGameStateD<Realisation>>(function, start);
     else {
         std::cout << "Unknown flavour" << std::endl;
         return 1;

@@ -2,17 +2,17 @@
 
 #include "CreatePositionUtil.h"
 
-const AdjacencyMatrixPosition createRestrictedAdjacencyMatrixPosition(size_t nBlueHalfs, size_t nRedHalfs, size_t nBlueWholes, size_t nRedWholes) {
-    const size_t requiredNodes = 1 + 2 * nBlueHalfs + 2 * nRedHalfs + nBlueWholes + nRedWholes;
+const AdjacencyMatrixPosition createRestrictedAdjacencyMatrixPosition(size_t nBlueHalves, size_t nRedHalves, size_t nBlueWholes, size_t nRedWholes) {
+    const size_t requiredNodes = 1 + 2 * nBlueHalves + 2 * nRedHalves + nBlueWholes + nRedWholes;
     AdjacencyMatrixPosition position(requiredNodes);
 
     size_t index = 1;
-    for (size_t i = 0; i < nBlueHalfs; i++) {
+    for (size_t i = 0; i < nBlueHalves; i++) {
         position.addPiece(Edge(0, index), PieceColour::BLUE);
         position.addPiece(Edge(index, index + 1), PieceColour::RED);
         index += 2;
     }
-    for (size_t i = 0; i < nRedHalfs; i++) {
+    for (size_t i = 0; i < nRedHalves; i++) {
         position.addPiece(Edge(0, index), PieceColour::RED);
         position.addPiece(Edge(index, index + 1), PieceColour::BLUE);
         index += 2;
@@ -29,22 +29,35 @@ const AdjacencyMatrixPosition createRestrictedAdjacencyMatrixPosition(size_t nBl
     return position;
 }
 
-const RestrictedPosition createRestrictedPosition(size_t nBlueHalfs, size_t nRedHalfs, size_t nBlueWholes, size_t nRedWholes) {
+const RestrictedPosition createRestrictedPosition(size_t nBlueHalves, size_t nRedHalves, size_t nBlueWholes, size_t nRedWholes) {
     RestrictedPosition position;
 
     size_t index = 0;
-    for (size_t i = 0; i < nBlueHalfs; i++) {
+    for (size_t i = 0; i < nBlueHalves; i++) {
         position.addPiece(RestrictedPiece(index, PieceColour::BLUE));
         position.addPiece(RestrictedPiece(index, PieceColour::RED));
         index++;
     }
-    for (size_t i = 0; i < nRedHalfs; i++) {
+    for (size_t i = 0; i < nRedHalves; i++) {
         position.addPiece(RestrictedPiece(index, PieceColour::RED));
         position.addPiece(RestrictedPiece(index, PieceColour::BLUE));
         index++;
     }
     for (size_t i = 0; i < nBlueWholes; i++) position.addPiece(RestrictedPiece(index++, PieceColour::BLUE));
     for (size_t i = 0; i < nRedWholes; i++) position.addPiece(RestrictedPiece(index++, PieceColour::RED));
+
+    return position;
+}
+
+const AdjacencyMatrixPosition createCircusTentAdjacencyMatrixPosition(size_t nLegs) {
+    const size_t requiredNodes = 2 + nLegs;
+    AdjacencyMatrixPosition position(requiredNodes);
+
+    size_t top = requiredNodes - 1; // the top node of the circus tent that all red edges connect to
+    for (size_t i = 1; i <= nLegs; i++) {
+        position.addPiece(Edge(0, i), PieceColour::BLUE);
+        position.addPiece(Edge(i, top), PieceColour::RED);
+    }
 
     return position;
 }

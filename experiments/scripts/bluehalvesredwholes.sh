@@ -14,7 +14,7 @@ for i in $(seq 0 $x)
 do
     for j in $(seq 0 $y)
     do
-        res=$(./build/quantum-hackenbush-suite $function $i 0 0 $j $flavour)
+        res=$(./build/quantum-hackenbush-suite ${function} halvesWholes_${i}_0_0_${j} $flavour)
         # append to output (replace newline with comma)
         $(echo "$res" | tr '\n' ',' >> $output)
     done

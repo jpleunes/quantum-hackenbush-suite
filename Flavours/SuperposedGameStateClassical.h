@@ -8,7 +8,7 @@ class SuperposedGameStateClassical : public SuperposedGameState<Realisation> {
 public:
     SuperposedGameStateClassical(GameStateId classicalGameState, SuperposedGameStateId id);
     SuperposedGameStateClassical(std::set<GameStateId> realisations, SuperposedGameStateId id);
-    std::vector<SuperposedGameStateId> getOptions(Player player) const override;
+    std::vector<SuperposedGameStateId> getOptions(Player player, size_t width) const override;
 
     ~SuperposedGameStateClassical() override = default;
 };
@@ -25,7 +25,7 @@ SuperposedGameStateClassical<Realisation>::SuperposedGameStateClassical(std::set
 }
 
 template<typename Realisation>
-std::vector<SuperposedGameStateId> SuperposedGameStateClassical<Realisation>::getOptions(Player player) const {
+std::vector<SuperposedGameStateId> SuperposedGameStateClassical<Realisation>::getOptions(Player player, __attribute__((unused)) size_t width) const {
     if (player == Player::LEFT && this->cache.leftOptions.has_value()) return this->cache.leftOptions.value();
     else if (player == Player::RIGHT && this->cache.rightOptions.has_value()) return this->cache.rightOptions.value();
 

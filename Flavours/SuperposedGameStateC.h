@@ -8,7 +8,7 @@ class SuperposedGameStateC : public SuperposedGameState<Realisation> {
 public:
     SuperposedGameStateC(GameStateId classicalGameState, SuperposedGameStateId);
     SuperposedGameStateC(std::set<GameStateId> realisations, SuperposedGameStateId id);
-    std::vector<SuperposedGameStateId> getOptions(Player player) const override;
+    std::vector<SuperposedGameStateId> getOptions(Player player, size_t width) const override;
 
     ~SuperposedGameStateC() override = default;
 };
@@ -24,7 +24,7 @@ SuperposedGameStateC<Realisation>::SuperposedGameStateC(std::set<GameStateId> re
 }
 
 template<typename Realisation>
-std::vector<SuperposedGameStateId> SuperposedGameStateC<Realisation>::getOptions(Player player) const {
+std::vector<SuperposedGameStateId> SuperposedGameStateC<Realisation>::getOptions(Player player, size_t width) const {
     if (player == Player::LEFT && this->cache.leftOptions.has_value()) return this->cache.leftOptions.value();
     else if (player == Player::RIGHT && this->cache.rightOptions.has_value()) return this->cache.rightOptions.value();
 
@@ -42,7 +42,7 @@ std::vector<SuperposedGameStateId> SuperposedGameStateC<Realisation>::getOptions
         }
         if (allValid && !option.empty()) result.emplace_back(SuperposedGameStateDatabase<SuperposedGameStateC<Realisation>>::getInstance().getOrInsert(option).getId());
     }
-    std::vector<SuperposedGameStateId> superposedOptions = getSuperposedOptions<SuperposedGameStateC<Realisation>>(player);
+    std::vector<SuperposedGameStateId> superposedOptions = getSuperposedOptions<SuperposedGameStateC<Realisation>>(player, width);
     result.insert(result.end(), superposedOptions.begin(), superposedOptions.end());
 
     if (player == Player::LEFT) this->cache.leftOptions = result;

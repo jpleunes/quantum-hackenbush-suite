@@ -11,8 +11,6 @@
 #include "../../Util/HashUtil.h"
 #include "Generator.h"
 
-const int width = 2;
-
 typedef size_t SuperposedGameStateId;
 
 #include "SuperposedGameStateDatabase.h" // This include needs to be here, because it depends on SuperposedGameStateId
@@ -49,19 +47,19 @@ public:
     // for a given player.
     std::vector<typename Realisation::Piece> getPieces(Player player) const;
 
-    virtual std::vector<SuperposedGameStateId> getOptions(Player player) const = 0;
+    virtual std::vector<SuperposedGameStateId> getOptions(Player player, size_t width) const = 0;
 
     // Inspired by Xander Lenstra https://github.com/xlenstra/CGSynch.
     template<typename Flavour>
-    ShortGameId determineShortGameId() const {
+    ShortGameId determineShortGameId(size_t width) const {
         if (cache.shortGameId.has_value()) return cache.shortGameId.value();
 
         std::set<ShortGameId> leftOptions, rightOptions;
-        for (SuperposedGameStateId leftOption : getOptions(Player::LEFT)) {
-            leftOptions.insert(SuperposedGameStateDatabase<Flavour>::getInstance().getSuperposedGameState(leftOption).template determineShortGameId<Flavour>());
+        for (SuperposedGameStateId leftOption : getOptions(Player::LEFT, width)) {
+            leftOptions.insert(SuperposedGameStateDatabase<Flavour>::getInstance().getSuperposedGameState(leftOption).template determineShortGameId<Flavour>(width));
         }
-        for (SuperposedGameStateId rightOption : getOptions(Player::RIGHT)) {
-            rightOptions.insert(SuperposedGameStateDatabase<Flavour>::getInstance().getSuperposedGameState(rightOption).template determineShortGameId<Flavour>());
+        for (SuperposedGameStateId rightOption : getOptions(Player::RIGHT, width)) {
+            rightOptions.insert(SuperposedGameStateDatabase<Flavour>::getInstance().getSuperposedGameState(rightOption).template determineShortGameId<Flavour>(width));
         }
         ShortGameId result = ShortGameDatabase::getInstance().getOrInsert(leftOptions, rightOptions).getId();
 
@@ -74,25 +72,29 @@ public:
 
 protected:
     template<typename Flavour>
-    std::vector<SuperposedGameStateId> getSuperposedOptions(Player player) const { // TODO: also allow moves with width >2 (use width as the maximum width?)
+    std::vector<SuperposedGameStateId> getSuperposedOptions(Player player, size_t width) const {
         std::vector<typename Realisation::Piece> pieces = getPieces(player);
 
         std::vector<SuperposedGameStateId> result;
-        if (pieces.size() < width) return result;
-        auto indexCombinationsGen = indexCombinations(pieces.size());
-        while (indexCombinationsGen) {
-            std::vector<size_t> move = indexCombinationsGen();
-            std::set<GameStateId> option;
-            for (GameStateId realisationId : realisations) {
-                for (size_t pieceIndex : move) {
-                    GameState<Realisation> realisation = GameStateDatabase<Realisation>::getInstance().getGameState(realisationId);
-                    std::optional<GameStateId> newRealisationId = realisation.applyMove(pieces[pieceIndex]);
-                    if (newRealisationId.has_value()) option.insert(newRealisationId.value());
+        // We cannot make moves that are wider than the number of pieces
+        width = std::min(width, pieces.size());
+        // Apply all superposed moves of width 2<=w<=width
+        for (size_t w = 2; w <= width; w++) {
+        auto indexCombinationsGen = indexCombinations(pieces.size(), w);
+            while (indexCombinationsGen) {
+                std::vector<size_t> move = indexCombinationsGen();
+                std::set<GameStateId> option;
+                for (GameStateId realisationId : realisations) {
+                    for (size_t pieceIndex : move) {
+                        GameState<Realisation> realisation = GameStateDatabase<Realisation>::getInstance().getGameState(realisationId);
+                        std::optional<GameStateId> newRealisationId = realisation.applyMove(pieces[pieceIndex]);
+                        if (newRealisationId.has_value()) option.insert(newRealisationId.value());
+                    }
                 }
-            }
-            if (!option.empty()) {
-                SuperposedGameStateId superposedGameStateId = SuperposedGameStateDatabase<Flavour>::getInstance().getOrInsert(option).getId();
-                result.emplace_back(superposedGameStateId);
+                if (!option.empty()) {
+                    SuperposedGameStateId superposedGameStateId = SuperposedGameStateDatabase<Flavour>::getInstance().getOrInsert(option).getId();
+                    result.emplace_back(superposedGameStateId);
+                }
             }
         }
         return result;
@@ -104,26 +106,27 @@ private:
     const std::set<GameStateId> realisations;
     const SuperposedGameStateId id;
 
-    /// @brief TODO
-    /// @param n 
-    /// @return 
-    Generator<std::vector<size_t>> indexCombinations(size_t n) const {
+    /// @brief Gets all lexicographically strictly increasing vectors of indices ranging from 0 to n-1, of size w.
+    /// @param n up to which value (exclusive) the indices should range
+    /// @param w the size of the combination vectors that should be returned
+    /// @return generator yielding vectors representing combinations of indices
+    Generator<std::vector<size_t>> indexCombinations(size_t n, size_t w) const {
         // This algorithm is a C++ adaptation of https://github.com/blazs/subsets
-        std::vector<size_t> combination(width);
+        std::vector<size_t> combination(w);
         int i, j, r;
 
-        for (i = 0; i < width; ++i) combination[i] = i; // Initial combination
+        for (i = 0; i < (int) w; ++i) combination[i] = i; // Initial combination
         while (true) {
             std::vector<size_t> combinationCopy = combination;
             co_yield combinationCopy;
 
-            if (combination[0] == n - width) break;
+            if (combination[0] == n - w) break;
 
-            for (i = width - 1; i >= 0 && combination[i] + width - i == n; --i);
+            for (i = w - 1; i >= 0 && combination[i] + w - i == n; --i);
             r = combination[i];
             ++combination[i];
             j = 2;
-            for (++i; i < width; ++i, ++j) combination[i] = r + j;
+            for (++i; i < (int) w; ++i, ++j) combination[i] = r + j;
         }
     }
 };

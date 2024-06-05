@@ -8,7 +8,7 @@ class SuperposedGameStateA : public SuperposedGameState<Realisation> {
 public:
     SuperposedGameStateA(GameStateId classicalGameState, SuperposedGameStateId id);
     SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id);
-    std::vector<SuperposedGameStateId> getOptions(Player player) const override;
+    std::vector<SuperposedGameStateId> getOptions(Player player, size_t width) const override;
 
     ~SuperposedGameStateA() override = default;
 };
@@ -21,14 +21,15 @@ SuperposedGameStateA<Realisation>::SuperposedGameStateA(GameStateId classicalGam
 
 template<typename Realisation>
 SuperposedGameStateA<Realisation>::SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id) : SuperposedGameState<Realisation>(realisations, id) {
+    // TODO: only keep non-covered realisations
 }
 
 template<typename Realisation>
-std::vector<SuperposedGameStateId> SuperposedGameStateA<Realisation>::getOptions(Player player) const {
+std::vector<SuperposedGameStateId> SuperposedGameStateA<Realisation>::getOptions(Player player, size_t width) const {
     if (player == Player::LEFT && this->cache.leftOptions.has_value()) return this->cache.leftOptions.value();
     else if (player == Player::RIGHT && this->cache.rightOptions.has_value()) return this->cache.rightOptions.value();
     
-    std::vector<SuperposedGameStateId> result = getSuperposedOptions<SuperposedGameStateA<Realisation>>(player);
+    std::vector<SuperposedGameStateId> result = getSuperposedOptions<SuperposedGameStateA<Realisation>>(player, width);
 
     if (player == Player::LEFT) this->cache.leftOptions = result;
     else if (player == Player::RIGHT) this->cache.rightOptions = result;

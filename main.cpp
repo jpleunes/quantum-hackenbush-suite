@@ -11,10 +11,13 @@
 #include "Flavours/SuperposedGameStateCPrime.h"
 #include "Flavours/SuperposedGameStateD.h"
 
+// By default, allow superposed moves of unbounded width
+size_t width = std::numeric_limits<size_t>::max(); 
+
 template<typename Flavour>
 ShortGameId gameStateIdToShortGameId(GameStateId gameStateId) {
     Flavour startSuperposedGameState = SuperposedGameStateDatabase<Flavour>::getInstance().getOrInsert(gameStateId);
-    return startSuperposedGameState.template determineShortGameId<Flavour>();
+    return startSuperposedGameState.template determineShortGameId<Flavour>(width);
 }
 
 template<typename Realisation>
@@ -63,12 +66,14 @@ void analyse(std::string function, GameStateId startGameState, std::string flavo
 
 int main(int argc, char **argv) {
     if (argc < 4) {
-        std::cout << "Usage: qhs <function>[outcome,value,birthday] <position>[halvesWholes_<nBlueHalves>_<nRedHalves>_<nBlueWholes>_<nRedWholes>, circusTent_<nLegs>, file] <flavour>[classical,a,b,c,cprime,d]" << std::endl;
+        std::cout << "Usage: qhs <function>[outcome,value,birthday] <position>[halvesWholes_<nBlueHalves>_<nRedHalves>_<nBlueWholes>_<nRedWholes>, circusTent_<nLegs>, file] <flavour>[classical,a,b,c,cprime,d] <max_width>(optional)" << std::endl;
         return 1;
     }
     std::string function = argv[1];
     std::string position = argv[2];
     std::string flavour = argv[3];
+    // If a maximum width is set, use this value
+    if (argc > 4) width = std::stoi(argv[4]);
 
     // Split position string on "_"
     std::stringstream stream(position);
@@ -101,7 +106,7 @@ int main(int argc, char **argv) {
         }
         size_t nLegs = std::stoi(parts[1]);
 
-        // TODO: use more efficient CircusTentPostion representation
+        // TODO: use more efficient CircusTentPosition representation
         const AdjacencyMatrixPosition start = createCircusTentAdjacencyMatrixPosition(nLegs);
         #ifdef DEBUG
         start.printHumanReadable();

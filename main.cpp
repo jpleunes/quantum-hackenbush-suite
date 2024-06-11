@@ -66,7 +66,7 @@ void analyse(std::string function, GameStateId startGameState, std::string flavo
 
 int main(int argc, char **argv) {
     if (argc < 4) {
-        std::cout << "Usage: qhs <function>[outcome,value,birthday] <position>[halvesWholes_<nBlueHalves>_<nRedHalves>_<nBlueWholes>_<nRedWholes>, circusTent_<nLegs>, file] <flavour>[classical,a,b,c,cprime,d] <max_width>(optional)" << std::endl;
+        std::cout << "Usage: qhs <function>[outcome,value,birthday] <position>[shortHollyhocks_<nBlueHalves>_<nRedHalves>_<nBlueWholes>_<nRedWholes>, circusTent_<nLegs>, file] <flavour>[classical,a,b,c,cprime,d] <max_width>(optional)" << std::endl;
         return 1;
     }
     std::string function = argv[1];
@@ -82,9 +82,9 @@ int main(int argc, char **argv) {
     char delimiter = '_';
     while (getline(stream, part, delimiter)) parts.push_back(part);
 
-    if (parts[0] == "halvesWholes") {
+    if (parts[0] == "shortHollyhocks") {
         if (parts.size() != 5) {
-            std::cout << "halvesWholes positon string should be formatted as halvesWholes_<nBlueHalves>_<nRedHalves>_<nBlueWholes>_<nRedWholes>" << std::endl;
+            std::cout << "halvesWholes positon string should be formatted as shortHollyhocks_<nBlueHalves>_<nRedHalves>_<nBlueWholes>_<nRedWholes>" << std::endl;
             return 1;
         }
         size_t nBlueHalves = std::stoi(parts[1]);
@@ -92,12 +92,12 @@ int main(int argc, char **argv) {
         size_t nBlueWholes = std::stoi(parts[3]);
         size_t nRedWholes = std::stoi(parts[4]);
 
-        const RestrictedPosition start = createRestrictedPosition(nBlueHalves, nRedHalves, nBlueWholes, nRedWholes);
+        const ShortHollyhocksPosition start = createShortHollyhocksPosition(nBlueHalves, nRedHalves, nBlueWholes, nRedWholes);
         #ifdef DEBUG
         start.printHumanReadable();
         #endif
-        GameStateId startGameState = GameStateDatabase<RestrictedPosition>::getInstance().getOrInsert(start).getId();
-        analyse<RestrictedPosition>(function, startGameState, flavour);
+        GameStateId startGameState = GameStateDatabase<ShortHollyhocksPosition>::getInstance().getOrInsert(start).getId();
+        analyse<ShortHollyhocksPosition>(function, startGameState, flavour);
     }
     else if (parts[0] == "circusTent") {
         if (parts.size() != 2) {

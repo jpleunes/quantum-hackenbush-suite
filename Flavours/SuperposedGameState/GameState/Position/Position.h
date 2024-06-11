@@ -28,12 +28,12 @@ struct Edge {
     }
 };
 
-typedef size_t RestrictedIndex;
-struct RestrictedPiece {
-    RestrictedIndex index;
+typedef size_t ShortHollyhocksIndex;
+struct ShortHollyhocksPiece {
+    ShortHollyhocksIndex index;
     PieceColour colour;
 
-    friend int operator<(const RestrictedPiece& lhs, const RestrictedPiece& rhs) {
+    friend int operator<(const ShortHollyhocksPiece& lhs, const ShortHollyhocksPiece& rhs) {
         return lhs.index < rhs.index || (lhs.index == rhs.index && lhs.colour < rhs.colour);
     }
 };

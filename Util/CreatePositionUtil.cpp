@@ -2,7 +2,7 @@
 
 #include "CreatePositionUtil.h"
 
-const AdjacencyMatrixPosition createRestrictedAdjacencyMatrixPosition(size_t nBlueHalves, size_t nRedHalves, size_t nBlueWholes, size_t nRedWholes) {
+const AdjacencyMatrixPosition createShortHollyhocksAdjacencyMatrixPosition(size_t nBlueHalves, size_t nRedHalves, size_t nBlueWholes, size_t nRedWholes) {
     const size_t requiredNodes = 1 + 2 * nBlueHalves + 2 * nRedHalves + nBlueWholes + nRedWholes;
     AdjacencyMatrixPosition position(requiredNodes);
 
@@ -29,22 +29,22 @@ const AdjacencyMatrixPosition createRestrictedAdjacencyMatrixPosition(size_t nBl
     return position;
 }
 
-const RestrictedPosition createRestrictedPosition(size_t nBlueHalves, size_t nRedHalves, size_t nBlueWholes, size_t nRedWholes) {
-    RestrictedPosition position;
+const ShortHollyhocksPosition createShortHollyhocksPosition(size_t nBlueHalves, size_t nRedHalves, size_t nBlueWholes, size_t nRedWholes) {
+    ShortHollyhocksPosition position;
 
     size_t index = 0;
     for (size_t i = 0; i < nBlueHalves; i++) {
-        position.addPiece(RestrictedPiece(index, PieceColour::BLUE));
-        position.addPiece(RestrictedPiece(index, PieceColour::RED));
+        position.addPiece(ShortHollyhocksPiece(index, PieceColour::BLUE));
+        position.addPiece(ShortHollyhocksPiece(index, PieceColour::RED));
         index++;
     }
     for (size_t i = 0; i < nRedHalves; i++) {
-        position.addPiece(RestrictedPiece(index, PieceColour::RED));
-        position.addPiece(RestrictedPiece(index, PieceColour::BLUE));
+        position.addPiece(ShortHollyhocksPiece(index, PieceColour::RED));
+        position.addPiece(ShortHollyhocksPiece(index, PieceColour::BLUE));
         index++;
     }
-    for (size_t i = 0; i < nBlueWholes; i++) position.addPiece(RestrictedPiece(index++, PieceColour::BLUE));
-    for (size_t i = 0; i < nRedWholes; i++) position.addPiece(RestrictedPiece(index++, PieceColour::RED));
+    for (size_t i = 0; i < nBlueWholes; i++) position.addPiece(ShortHollyhocksPiece(index++, PieceColour::BLUE));
+    for (size_t i = 0; i < nRedWholes; i++) position.addPiece(ShortHollyhocksPiece(index++, PieceColour::RED));
 
     return position;
 }

@@ -1,22 +1,22 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "RestrictedPosition.h"
+#include "ShortHollyhocksPosition.h"
 
-RestrictedPosition::RestrictedPosition() : entries() {
+ShortHollyhocksPosition::ShortHollyhocksPosition() : entries() {
 }
 
-RestrictedPosition::RestrictedPosition(const RestrictedPosition& other) : entries(other.entries) {
+ShortHollyhocksPosition::ShortHollyhocksPosition(const ShortHollyhocksPosition& other) : entries(other.entries) {
 }
 
-bool RestrictedPosition::operator==(const RestrictedPosition& other) const {
+bool ShortHollyhocksPosition::operator==(const ShortHollyhocksPosition& other) const {
     if (entries.size() != other.entries.size()) return false;
     for (size_t i = 0; i < entries.size(); i++)
         if (entries[i] != other.entries[i]) return false;
     return true;
 }
 
-void RestrictedPosition::addPiece(RestrictedPiece piece) {
+void ShortHollyhocksPosition::addPiece(ShortHollyhocksPiece piece) {
     if (piece.index >= entries.size()) entries.resize(piece.index + 1, HalfOrWhole::NONE);
 
     HalfOrWhole entry = entries[piece.index];
@@ -30,7 +30,7 @@ void RestrictedPosition::addPiece(RestrictedPiece piece) {
                 entries[piece.index] = HalfOrWhole::RED_HALF;
                 return;
             }
-            throw(std::logic_error("Cannot add piece to restricted position at given index."));
+            throw(std::logic_error("Cannot add piece to Short Hollyhocks position at given index."));
         case PieceColour::RED:
             if (entry == HalfOrWhole::NONE) {
                 entries[piece.index] = HalfOrWhole::RED_WHOLE;
@@ -40,25 +40,25 @@ void RestrictedPosition::addPiece(RestrictedPiece piece) {
                 entries[piece.index] = HalfOrWhole::BLUE_HALF;
                 return;
             }
-            throw(std::logic_error("Cannot add piece to restricted position at given index."));
+            throw(std::logic_error("Cannot add piece to Sort Hollyhocks position at given index."));
         default:
             throw(std::domain_error("Unsupported colour case."));
     }
 }
 
-std::set<RestrictedPiece> RestrictedPosition::getPieces(Player player) const {
-    std::set<RestrictedPiece> result;
+std::set<ShortHollyhocksPiece> ShortHollyhocksPosition::getPieces(Player player) const {
+    std::set<ShortHollyhocksPiece> result;
     for (size_t index = 0; index < entries.size(); index++) {
         HalfOrWhole entry = entries[index];
         if (player == Player::LEFT && (entry == HalfOrWhole::BLUE_HALF || entry == HalfOrWhole::RED_HALF || entry == HalfOrWhole::BLUE_WHOLE))
-            result.insert(RestrictedPiece(index, PieceColour::BLUE));
+            result.insert(ShortHollyhocksPiece(index, PieceColour::BLUE));
         else if (player == Player::RIGHT && (entry == HalfOrWhole::BLUE_HALF || entry == HalfOrWhole::RED_HALF || entry == HalfOrWhole::RED_WHOLE))
-            result.insert(RestrictedPiece(index, PieceColour::RED));
+            result.insert(ShortHollyhocksPiece(index, PieceColour::RED));
     }
     return result;
 }
 
-bool RestrictedPosition::removePiece(RestrictedPiece piece) {
+bool ShortHollyhocksPosition::removePiece(ShortHollyhocksPiece piece) {
     HalfOrWhole entry = entries[piece.index];
     switch (piece.colour) {
         case PieceColour::BLUE: 
@@ -89,8 +89,8 @@ bool RestrictedPosition::removePiece(RestrictedPiece piece) {
     return true;
 }
 
-void RestrictedPosition::printHumanReadable() const {
-    std::cout << "===== RestrictedPosition =====" << std::endl;
+void ShortHollyhocksPosition::printHumanReadable() const {
+    std::cout << "===== ShortHollyhocksPosition =====" << std::endl;
     for (HalfOrWhole entry : entries) {
         if (entry == HalfOrWhole::BLUE_HALF) std::cout << "BH ";
         else if (entry == HalfOrWhole::RED_HALF) std::cout << "RH ";

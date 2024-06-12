@@ -10,6 +10,7 @@
 #include "GameState/GameStateDatabase.h"
 #include "../../Util/HashUtil.h"
 #include "Generator.h"
+#include "GameState/Position/ShortHollyhocksPosition.h"
 
 typedef size_t SuperposedGameStateId;
 
@@ -99,6 +100,35 @@ protected:
         }
         return result;
     }
+
+    std::set<GameStateId> determineNonCoveredRealisations(std::set<GameStateId> realisations) {
+    std::set<GameStateId> nonCoveredRealisations;
+    for (GameStateId realisationId : realisations) {
+        GameState<ShortHollyhocksPosition> realisation = GameStateDatabase<ShortHollyhocksPosition>::getInstance().getGameState(realisationId);
+        std::set<ShortHollyhocksPiece> pieces = realisation.getPieces();
+
+        // Check if there exists another realisation that we want to keep containing all of this realisation's pieces
+        bool covered = false;
+        for (GameStateId otherRealisationId : nonCoveredRealisations) {
+            GameState<ShortHollyhocksPosition> otherRealisation = GameStateDatabase<ShortHollyhocksPosition>::getInstance().getGameState(otherRealisationId);
+            std::set<ShortHollyhocksPiece> otherPieces = otherRealisation.getPieces();
+            bool hasNewPiece = false;
+            for (ShortHollyhocksPiece piece : pieces) {
+                if (!otherPieces.contains(piece)) {
+                    hasNewPiece = true;
+                    break;
+                }
+            }
+            if (!hasNewPiece) {
+                covered = true;
+                break;
+            }
+        }
+        if (!covered) nonCoveredRealisations.insert(realisationId);
+    }
+
+    return nonCoveredRealisations;
+}
 
     mutable SuperposedGameStateCache cache;
     

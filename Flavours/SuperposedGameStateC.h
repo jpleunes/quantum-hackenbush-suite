@@ -17,7 +17,7 @@ public:
 
 template<typename Realisation>
 SuperposedGameStateC<Realisation>::SuperposedGameStateC(GameStateId classicalGameState, SuperposedGameStateId id) : SuperposedGameState<Realisation>(classicalGameState) {
-};
+}
 
 template<typename Realisation>
 SuperposedGameStateC<Realisation>::SuperposedGameStateC(std::set<GameStateId> realisations, SuperposedGameStateId id) : SuperposedGameState<Realisation>(realisations, id) {
@@ -49,6 +49,6 @@ std::vector<SuperposedGameStateId> SuperposedGameStateC<Realisation>::getOptions
     else if (player == Player::RIGHT) this->cache.rightOptions = result;
 
     return result;
-};
+}
 
 #endif // SUPERPOSED_GAME_STATE_C_H

@@ -17,11 +17,15 @@ public:
 
 template<typename Realisation>
 SuperposedGameStateA<Realisation>::SuperposedGameStateA(GameStateId classicalGameState, SuperposedGameStateId id) : SuperposedGameState<Realisation>(classicalGameState, id) {
-};
+}
 
 template<typename Realisation>
 SuperposedGameStateA<Realisation>::SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id) : SuperposedGameState<Realisation>(realisations, id) {
-    // TODO: only keep non-covered realisations
+}
+
+// For flavour A, if we are considering Short Hollyhocks positions, we can discard covered realisations
+template<>
+SuperposedGameStateA<ShortHollyhocksPosition>::SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id) : SuperposedGameState<ShortHollyhocksPosition>(determineNonCoveredRealisations(realisations), id) {   
 }
 
 template<typename Realisation>
@@ -35,6 +39,6 @@ std::vector<SuperposedGameStateId> SuperposedGameStateA<Realisation>::getOptions
     else if (player == Player::RIGHT) this->cache.rightOptions = result;
 
     return result;
-};
+}
 
 #endif // SUPERPOSED_GAME_STATE_A_H

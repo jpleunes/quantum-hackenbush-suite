@@ -8,7 +8,7 @@
 
 template<typename Piece>
 struct GameStateCache {
-    std::optional<std::set<Piece>> leftPieces, rightPieces;
+    std::optional<std::set<Piece>> leftPieces, rightPieces, pieces;
     std::map<Piece, std::optional<GameStateId>> moveOptions;
 };
 
@@ -25,6 +25,7 @@ public:
     bool operator==(const GameState<Position>& other) const { return position == other.position; }
 
     std::set<typename Position::Piece> getPieces(Player player) const;
+    std::set<typename Position::Piece> getPieces() const;
     /// @brief Constructs a GameState instance representing the result of applying the given move.
     /// @param piece the piece to remove
     /// @return the id of the resulting GameState instance, or {} if the move was illegal
@@ -54,6 +55,21 @@ std::set<typename Position::Piece> GameState<Position>::getPieces(Player player)
 
     if (player == Player::LEFT) cache.leftPieces = result;
     else if (player == Player::RIGHT) cache.rightPieces = result;
+
+    return result;
+}
+
+template<typename Position>
+std::set<typename Position::Piece> GameState<Position>::getPieces() const {
+    if (cache.pieces.has_value()) return cache.pieces.value();
+
+    std::set<typename Position::Piece> result;
+    std::set<typename Position::Piece> leftPieces = getPieces(Player::LEFT);
+    std::set<typename Position::Piece> rightPieces = getPieces(Player::RIGHT);
+    result.insert(leftPieces.begin(), leftPieces.end());
+    result.insert(rightPieces.begin(), rightPieces.end());
+
+    cache.pieces = result;
 
     return result;
 }

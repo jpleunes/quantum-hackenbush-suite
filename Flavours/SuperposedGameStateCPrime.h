@@ -17,7 +17,7 @@ public:
 
 template<typename Realisation>
 SuperposedGameStateCPrime<Realisation>::SuperposedGameStateCPrime(GameStateId classicalGameState, SuperposedGameStateId id) : SuperposedGameState<Realisation>(classicalGameState, id) {
-};
+}
 
 template<typename Realisation>
 SuperposedGameStateCPrime<Realisation>::SuperposedGameStateCPrime(std::set<GameStateId> realisations, SuperposedGameStateId id) : SuperposedGameState<Realisation>(realisations, id) {
@@ -53,6 +53,6 @@ std::vector<SuperposedGameStateId> SuperposedGameStateCPrime<Realisation>::getOp
     else if (player == Player::RIGHT) this->cache.rightOptions = result;
 
     return result;
-};
+}
 
 #endif // SUPERPOSED_GAME_STATE_C_PRIME_H

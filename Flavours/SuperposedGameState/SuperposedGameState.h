@@ -19,7 +19,6 @@ typedef size_t SuperposedGameStateId;
 struct SuperposedGameStateCache {
     std::optional<std::vector<SuperposedGameStateId>> leftOptions, rightOptions;
     std::optional<ShortGameId> shortGameId;
-    std::optional<OutcomeClass> outcome, leftStartOutcome, rightStartOutcome;
     // TODO: displayString
 };
 
@@ -68,32 +67,6 @@ public:
         cache.shortGameId = result;
 
         return result;
-    }
-
-    template<typename Flavour>
-    OutcomeClass determineOutcomeClass(size_t width) const {
-        if (cache.outcome.has_value()) return cache.outcome.value();
-
-        OutcomeClass leftStartOutcome = determineOutcomeClass<Flavour>(Player::LEFT, width);
-        OutcomeClass rightStartOutcome = determineOutcomeClass<Flavour>(Player::RIGHT, width);
-        bool leftHasWinningMove = leftStartOutcome == OutcomeClass::L || leftStartOutcome == OutcomeClass::P;
-        bool rightHasWinningMove = rightStartOutcome == OutcomeClass::R || rightStartOutcome == OutcomeClass::P;
-        if (leftHasWinningMove && rightHasWinningMove) {
-            cache.outcome = OutcomeClass::N;
-            return OutcomeClass::N;
-        }
-        if (leftHasWinningMove) {
-            cache.outcome = OutcomeClass::L;
-            return OutcomeClass::L;
-        }
-        else if (rightHasWinningMove) {
-            cache.outcome = OutcomeClass::R;
-            return OutcomeClass::R;
-        }
-        else {
-            cache.outcome = OutcomeClass::P;
-            return OutcomeClass::P;
-        }
     }
 
     virtual ~SuperposedGameState() = default;
@@ -184,37 +157,6 @@ private:
             ++combination[i];
             j = 2;
             for (++i; i < (int) w; ++i, ++j) combination[i] = r + j;
-        }
-    }
-
-    template<typename Flavour>
-    OutcomeClass determineOutcomeClass(Player turn, size_t width) const {
-        if (turn == Player::LEFT && cache.leftStartOutcome.has_value()) return cache.leftStartOutcome.value();
-        else if (turn == Player::RIGHT && cache.rightStartOutcome.has_value()) return cache.rightStartOutcome.value();
-
-        switch (turn) {
-            case Player::LEFT:
-                for (SuperposedGameStateId option : getOptions(turn, width)) {
-                    OutcomeClass outcome = SuperposedGameStateDatabase<Flavour>::getInstance().getSuperposedGameState(option).template determineOutcomeClass<Flavour>(Player::RIGHT, width);
-                    if (outcome == OutcomeClass::L || outcome == OutcomeClass::P) {
-                        cache.leftStartOutcome = OutcomeClass::L;
-                        return OutcomeClass::L;
-                    }
-                }
-                cache.leftStartOutcome = OutcomeClass::R;
-                return OutcomeClass::R;
-            case Player::RIGHT:
-                for (SuperposedGameStateId option : getOptions(turn, width)) {
-                    OutcomeClass outcome = SuperposedGameStateDatabase<Flavour>::getInstance().getSuperposedGameState(option).template determineOutcomeClass<Flavour>(Player::LEFT, width);
-                    if (outcome == OutcomeClass::R || outcome == OutcomeClass::P) {
-                        cache.rightStartOutcome = OutcomeClass::R;
-                        return OutcomeClass::R;
-                    }
-                }
-                cache.rightStartOutcome = OutcomeClass::L;
-                return OutcomeClass::L;
-            default:
-                throw(std::domain_error("Unknown player case."));
         }
     }
 };

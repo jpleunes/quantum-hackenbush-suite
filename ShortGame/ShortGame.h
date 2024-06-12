@@ -6,9 +6,9 @@
 #include <unordered_map>
 
 #include "DyadicRational.h"
-
 #include "ShortGameUtil.h"
 #include "ShortGameDatabase.h"
+#include "../Flavours/SuperposedGameState/GameState/Position/Position.h"
 
 enum class OutcomeClass {
     L,
@@ -22,7 +22,7 @@ struct ShortGameCache {
     std::optional<ShortGameId> negativeId;
     std::unordered_map<ShortGameId, ShortGameId> disjunctiveSum = {};
     // TODO: displayString
-    std::optional<OutcomeClass> outcomeClass;
+    std::optional<OutcomeClass> outcomeClass, leftStartOutcomeClass, rightStartOutcomeClass;
     std::optional<size_t> birthday;
     std::optional<ShortGameId> canonicalFormId;
     std::optional<bool> isInteger;
@@ -72,6 +72,8 @@ public:
     void setCache(const ShortGameCache& cache) const { this->cache = cache; }
 
 private:
+    OutcomeClass determineOutcomeClass(Player turn) const;
+
     const std::set<ShortGameId> leftOptions, rightOptions;
     const ShortGameId id;
 

@@ -106,34 +106,60 @@ ShortGame& ShortGame::operator-(const ShortGame& other) const {
     return *this + (-other);
 }
 
+OutcomeClass ShortGame::determineOutcomeClass(Player turn) const {
+    if (turn == Player::LEFT && cache.leftStartOutcomeClass.has_value()) return cache.leftStartOutcomeClass.value();
+    else if (turn == Player::RIGHT && cache.rightStartOutcomeClass.has_value()) return cache.rightStartOutcomeClass.value();
+
+    switch (turn) {
+        case Player::LEFT:
+            for (ShortGameId option : leftOptions) {
+                OutcomeClass outcome = ShortGameDatabase::getInstance().getGame(option).determineOutcomeClass(Player::RIGHT);
+                if (outcome == OutcomeClass::L || outcome == OutcomeClass::P) {
+                    cache.leftStartOutcomeClass = OutcomeClass::L;
+                    return OutcomeClass::L;
+                }
+            }
+            cache.leftStartOutcomeClass = OutcomeClass::R;
+            return OutcomeClass::R;
+        case Player::RIGHT:
+            for (ShortGameId option : rightOptions) {
+                OutcomeClass outcome = ShortGameDatabase::getInstance().getGame(option).determineOutcomeClass(Player::LEFT);
+                if (outcome == OutcomeClass::R || outcome == OutcomeClass::P) {
+                    cache.rightStartOutcomeClass = OutcomeClass::R;
+                    return OutcomeClass::R;
+                }
+            }
+            cache.rightStartOutcomeClass = OutcomeClass::L;
+            return OutcomeClass::L;
+        default:
+            throw(std::domain_error("Unknown player case."));
+    }
+}
+
 // Inspired by Xander Lenstra https://github.com/xlenstra/CGSynch.
 OutcomeClass ShortGame::determineOutcomeClass() const {
     if (cache.outcomeClass.has_value()) return cache.outcomeClass.value();
 
-    OutcomeClass result = OutcomeClass::P;
-    bool leftHasWinningMove = false;
-    bool rightHasWinningMove = false;
-    for (ShortGameId leftOption : leftOptions) {
-        OutcomeClass leftOutcome = ShortGameDatabase::getInstance().getGame(leftOption).determineOutcomeClass();
-        if (leftOutcome == OutcomeClass::P || leftOutcome == OutcomeClass::L) {
-            leftHasWinningMove = true;
-            break;
-        }
+    OutcomeClass leftStartOutcome = determineOutcomeClass(Player::LEFT);
+    OutcomeClass rightStartOutcome = determineOutcomeClass(Player::RIGHT);
+    bool leftHasWinningMove = leftStartOutcome == OutcomeClass::L || leftStartOutcome == OutcomeClass::P;
+    bool rightHasWinningMove = rightStartOutcome == OutcomeClass::R || rightStartOutcome == OutcomeClass::P;
+    if (leftHasWinningMove && rightHasWinningMove) {
+        cache.outcomeClass = OutcomeClass::N;
+        return OutcomeClass::N;
     }
-    for (ShortGameId rightOption : rightOptions) {
-        OutcomeClass rightOutcome = ShortGameDatabase::getInstance().getGame(rightOption).determineOutcomeClass();
-        if (rightOutcome == OutcomeClass::R || rightOutcome == OutcomeClass::P) {
-            rightHasWinningMove = true;
-            break;
-        }
+    if (leftHasWinningMove) {
+        cache.outcomeClass = OutcomeClass::L;
+        return OutcomeClass::L;
     }
-    if (leftHasWinningMove && rightHasWinningMove) result = OutcomeClass::N;
-    else if (leftHasWinningMove) result = OutcomeClass::L;
-    else if (rightHasWinningMove) result = OutcomeClass::R;
-
-    cache.outcomeClass = result;
-
-    return result;
+    else if (rightHasWinningMove) {
+        cache.outcomeClass = OutcomeClass::R;
+        return OutcomeClass::R;
+    }
+    else {
+        cache.outcomeClass = OutcomeClass::P;
+        return OutcomeClass::P;
+    }
 }
 
 size_t ShortGame::determineBirthday() const {

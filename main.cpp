@@ -12,7 +12,7 @@
 #include "Flavours/SuperposedGameStateD.h"
 
 // By default, allow superposed moves of unbounded width
-size_t width = std::numeric_limits<size_t>::max(); // TODO: make this a global variable, so that we don't have to pass it along
+size_t width = std::numeric_limits<size_t>::max();
 
 template<typename Flavour>
 ShortGameId gameStateIdToShortGameId(GameStateId gameStateId) {
@@ -34,14 +34,7 @@ void analyse(std::string function, GameStateId startGameState, std::string flavo
     ShortGame& shortGame = ShortGameDatabase::getInstance().getGame(shortGameId);
 
     if (function == "outcome") {
-        OutcomeClass outcome = OutcomeClass::N;
-        if (flavour == "classical") outcome = SuperposedGameStateDatabase<SuperposedGameStateClassical<Realisation>>::getInstance().getOrInsert(startGameState).template determineOutcomeClass<SuperposedGameStateClassical<Realisation>>(width);
-        else if (flavour == "a") outcome = SuperposedGameStateDatabase<SuperposedGameStateA<Realisation>>::getInstance().getOrInsert(startGameState).template determineOutcomeClass<SuperposedGameStateA<Realisation>>(width);
-        else if (flavour == "b") outcome = SuperposedGameStateDatabase<SuperposedGameStateB<Realisation>>::getInstance().getOrInsert(startGameState).template determineOutcomeClass<SuperposedGameStateB<Realisation>>(width);
-        else if (flavour == "c") outcome = SuperposedGameStateDatabase<SuperposedGameStateC<Realisation>>::getInstance().getOrInsert(startGameState).template determineOutcomeClass<SuperposedGameStateC<Realisation>>(width);
-        else if (flavour == "cprime") outcome = SuperposedGameStateDatabase<SuperposedGameStateCPrime<Realisation>>::getInstance().getOrInsert(startGameState).template determineOutcomeClass<SuperposedGameStateCPrime<Realisation>>(width);
-        else if (flavour == "d") outcome = SuperposedGameStateDatabase<SuperposedGameStateD<Realisation>>::getInstance().getOrInsert(startGameState).template determineOutcomeClass<SuperposedGameStateD<Realisation>>(width);
-        else throw(std::domain_error("Unknown flavour."));
+        OutcomeClass outcome = shortGame.determineOutcomeClass();
         switch (outcome)
         {
             case OutcomeClass::L:

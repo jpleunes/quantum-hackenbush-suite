@@ -57,7 +57,7 @@ public:
 
     // TODO: getDisplayString
     // Determines the outcome class of this game.
-    OutcomeClass determineOutcomeClass() const; // TODO: add SuperposedGameState.efficientlyDetermineOutcomeClass function that alternates the player turns
+    OutcomeClass determineOutcomeClass() const;
     // Determines the birthday of this game.
     size_t determineBirthday() const;
     // Determines whether this game is in canonical form.

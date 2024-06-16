@@ -4,13 +4,20 @@
 #include "Position.h"
 #include "../../../../Util/HashUtil.h"
 
-enum class HalfOrWhole : char {
+enum class ShortHollyhock : char {
     BLUE_HALF,
     RED_HALF,
     BLUE_WHOLE,
     RED_WHOLE,
     NONE
 };
+
+void addShortHollyhocksPiece(Player player, size_t index, ShortHollyhock shortHollyhock, std::set<ShortHollyhocksPiece>& shortHollyhocksPieces) {
+    if (player == Player::LEFT && (shortHollyhock == ShortHollyhock::BLUE_HALF || shortHollyhock == ShortHollyhock::RED_HALF || shortHollyhock == ShortHollyhock::BLUE_WHOLE))
+        shortHollyhocksPieces.insert(ShortHollyhocksPiece(index, PieceColour::BLUE));
+    else if (player == Player::RIGHT && (shortHollyhock == ShortHollyhock::BLUE_HALF || shortHollyhock == ShortHollyhock::RED_HALF || shortHollyhock == ShortHollyhock::RED_WHOLE))
+        shortHollyhocksPieces.insert(ShortHollyhocksPiece(index, PieceColour::RED));
+}
 
 class ShortHollyhocksPosition : public Position<ShortHollyhocksPiece> {
 public:
@@ -22,12 +29,13 @@ public:
 
     void addPiece(ShortHollyhocksPiece piece);
     bool removePiece(ShortHollyhocksPiece piece) override;
+    const std::vector<ShortHollyhock>& getShortHollyhocks() const;
     std::set<ShortHollyhocksPiece> getPieces(Player player) const override;
     void printHumanReadable() const override;
 
     ~ShortHollyhocksPosition() override = default;
 
-    std::vector<HalfOrWhole> entries;
+    std::vector<ShortHollyhock> shortHollyhocks;
 };
 
 namespace std {
@@ -35,7 +43,7 @@ namespace std {
     struct hash<ShortHollyhocksPosition> {
         size_t operator()(const ShortHollyhocksPosition& position) const {
             std::vector<uint32_t> intVec;
-            for (HalfOrWhole x : position.entries) intVec.push_back((uint32_t) x);
+            for (ShortHollyhock x : position.shortHollyhocks) intVec.push_back((uint32_t) x);
             return std::hash<std::vector<uint32_t>>()(intVec);
         }
     };

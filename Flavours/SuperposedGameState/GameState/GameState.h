@@ -19,7 +19,7 @@ public:
     // Otherwise, GameStateDatabase.getOrInsert should be used.
     GameState(Position position, GameStateId id);
 
-    const Position& getGameState() const { return position; }
+    const Position& getPosition() const { return position; }
     GameStateId getId() const { return id; }
     // Checks whether two GameState instances have the same position.
     bool operator==(const GameState<Position>& other) const { return position == other.position; }

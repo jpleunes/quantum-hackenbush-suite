@@ -3,41 +3,41 @@
 
 #include "ShortHollyhocksPosition.h"
 
-ShortHollyhocksPosition::ShortHollyhocksPosition() : entries() {
+ShortHollyhocksPosition::ShortHollyhocksPosition() : shortHollyhocks() {
 }
 
-ShortHollyhocksPosition::ShortHollyhocksPosition(const ShortHollyhocksPosition& other) : entries(other.entries) {
+ShortHollyhocksPosition::ShortHollyhocksPosition(const ShortHollyhocksPosition& other) : shortHollyhocks(other.shortHollyhocks) {
 }
 
 bool ShortHollyhocksPosition::operator==(const ShortHollyhocksPosition& other) const {
-    if (entries.size() != other.entries.size()) return false;
-    for (size_t i = 0; i < entries.size(); i++)
-        if (entries[i] != other.entries[i]) return false;
+    if (shortHollyhocks.size() != other.shortHollyhocks.size()) return false;
+    for (size_t i = 0; i < shortHollyhocks.size(); i++)
+        if (shortHollyhocks[i] != other.shortHollyhocks[i]) return false;
     return true;
 }
 
 void ShortHollyhocksPosition::addPiece(ShortHollyhocksPiece piece) {
-    if (piece.index >= entries.size()) entries.resize(piece.index + 1, HalfOrWhole::NONE);
+    if (piece.index >= shortHollyhocks.size()) shortHollyhocks.resize(piece.index + 1, ShortHollyhock::NONE);
 
-    HalfOrWhole entry = entries[piece.index];
+    ShortHollyhock shortHollyhock = shortHollyhocks[piece.index];
     switch (piece.colour) {
         case PieceColour::BLUE:
-            if (entry == HalfOrWhole::NONE) {
-                entries[piece.index] = HalfOrWhole::BLUE_WHOLE;
+            if (shortHollyhock == ShortHollyhock::NONE) {
+                shortHollyhocks[piece.index] = ShortHollyhock::BLUE_WHOLE;
                 return;
             }
-            else if (entry == HalfOrWhole::RED_WHOLE) {
-                entries[piece.index] = HalfOrWhole::RED_HALF;
+            else if (shortHollyhock == ShortHollyhock::RED_WHOLE) {
+                shortHollyhocks[piece.index] = ShortHollyhock::RED_HALF;
                 return;
             }
             throw(std::logic_error("Cannot add piece to Short Hollyhocks position at given index."));
         case PieceColour::RED:
-            if (entry == HalfOrWhole::NONE) {
-                entries[piece.index] = HalfOrWhole::RED_WHOLE;
+            if (shortHollyhock == ShortHollyhock::NONE) {
+                shortHollyhocks[piece.index] = ShortHollyhock::RED_WHOLE;
                 return;
             }
-            else if (entry == HalfOrWhole::BLUE_WHOLE) {
-                entries[piece.index] = HalfOrWhole::BLUE_HALF;
+            else if (shortHollyhock == ShortHollyhock::BLUE_WHOLE) {
+                shortHollyhocks[piece.index] = ShortHollyhock::BLUE_HALF;
                 return;
             }
             throw(std::logic_error("Cannot add piece to Sort Hollyhocks position at given index."));
@@ -46,39 +46,39 @@ void ShortHollyhocksPosition::addPiece(ShortHollyhocksPiece piece) {
     }
 }
 
+const std::vector<ShortHollyhock>& ShortHollyhocksPosition::getShortHollyhocks() const {
+    return shortHollyhocks;
+}
+
 std::set<ShortHollyhocksPiece> ShortHollyhocksPosition::getPieces(Player player) const {
     std::set<ShortHollyhocksPiece> result;
-    for (size_t index = 0; index < entries.size(); index++) {
-        HalfOrWhole entry = entries[index];
-        if (player == Player::LEFT && (entry == HalfOrWhole::BLUE_HALF || entry == HalfOrWhole::RED_HALF || entry == HalfOrWhole::BLUE_WHOLE))
-            result.insert(ShortHollyhocksPiece(index, PieceColour::BLUE));
-        else if (player == Player::RIGHT && (entry == HalfOrWhole::BLUE_HALF || entry == HalfOrWhole::RED_HALF || entry == HalfOrWhole::RED_WHOLE))
-            result.insert(ShortHollyhocksPiece(index, PieceColour::RED));
+    for (size_t index = 0; index < shortHollyhocks.size(); index++) {
+        addShortHollyhocksPiece(player, index, shortHollyhocks[index], result);
     }
     return result;
 }
 
 bool ShortHollyhocksPosition::removePiece(ShortHollyhocksPiece piece) {
-    HalfOrWhole entry = entries[piece.index];
+    ShortHollyhock shortHollyhock = shortHollyhocks[piece.index];
     switch (piece.colour) {
         case PieceColour::BLUE: 
-            if (entry == HalfOrWhole::BLUE_HALF || entry == HalfOrWhole::BLUE_WHOLE) {
-                entries[piece.index] = HalfOrWhole::NONE;
+            if (shortHollyhock == ShortHollyhock::BLUE_HALF || shortHollyhock == ShortHollyhock::BLUE_WHOLE) {
+                shortHollyhocks[piece.index] = ShortHollyhock::NONE;
                 break;
             }
-            else if (entry == HalfOrWhole::RED_HALF) {
-                entries[piece.index] = HalfOrWhole::RED_WHOLE;
+            else if (shortHollyhock == ShortHollyhock::RED_HALF) {
+                shortHollyhocks[piece.index] = ShortHollyhock::RED_WHOLE;
                 break;
             }
 
             return false;
        case PieceColour::RED: 
-            if (entry == HalfOrWhole::RED_HALF || entry == HalfOrWhole::RED_WHOLE) {
-                entries[piece.index] = HalfOrWhole::NONE;
+            if (shortHollyhock == ShortHollyhock::RED_HALF || shortHollyhock == ShortHollyhock::RED_WHOLE) {
+                shortHollyhocks[piece.index] = ShortHollyhock::NONE;
                 break;
             }
-            else if (entry == HalfOrWhole::BLUE_HALF) {
-                entries[piece.index] = HalfOrWhole::BLUE_WHOLE;
+            else if (shortHollyhock == ShortHollyhock::BLUE_HALF) {
+                shortHollyhocks[piece.index] = ShortHollyhock::BLUE_WHOLE;
                 break;
             }
 
@@ -91,11 +91,11 @@ bool ShortHollyhocksPosition::removePiece(ShortHollyhocksPiece piece) {
 
 void ShortHollyhocksPosition::printHumanReadable() const {
     std::cout << "===== ShortHollyhocksPosition =====" << std::endl;
-    for (HalfOrWhole entry : entries) {
-        if (entry == HalfOrWhole::BLUE_HALF) std::cout << "BH ";
-        else if (entry == HalfOrWhole::RED_HALF) std::cout << "RH ";
-        else if (entry == HalfOrWhole::BLUE_WHOLE) std::cout << "BW ";
-        else if (entry == HalfOrWhole::RED_WHOLE) std::cout << "RW ";
+    for (ShortHollyhock shortHollyhock : shortHollyhocks) {
+        if (shortHollyhock == ShortHollyhock::BLUE_HALF) std::cout << "BH ";
+        else if (shortHollyhock == ShortHollyhock::RED_HALF) std::cout << "RH ";
+        else if (shortHollyhock == ShortHollyhock::BLUE_WHOLE) std::cout << "BW ";
+        else if (shortHollyhock == ShortHollyhock::RED_WHOLE) std::cout << "RW ";
         else std::cout << "NO ";
     }
     std::cout << std::endl;

@@ -12,13 +12,6 @@ enum class ShortHollyhock : char {
     NONE
 };
 
-void addShortHollyhocksPiece(Player player, size_t index, ShortHollyhock shortHollyhock, std::set<ShortHollyhocksPiece>& shortHollyhocksPieces) {
-    if (player == Player::LEFT && (shortHollyhock == ShortHollyhock::BLUE_HALF || shortHollyhock == ShortHollyhock::RED_HALF || shortHollyhock == ShortHollyhock::BLUE_WHOLE))
-        shortHollyhocksPieces.insert(ShortHollyhocksPiece(index, PieceColour::BLUE));
-    else if (player == Player::RIGHT && (shortHollyhock == ShortHollyhock::BLUE_HALF || shortHollyhock == ShortHollyhock::RED_HALF || shortHollyhock == ShortHollyhock::RED_WHOLE))
-        shortHollyhocksPieces.insert(ShortHollyhocksPiece(index, PieceColour::RED));
-}
-
 class ShortHollyhocksPosition : public Position<ShortHollyhocksPiece> {
 public:
     typedef ShortHollyhocksPiece Piece;

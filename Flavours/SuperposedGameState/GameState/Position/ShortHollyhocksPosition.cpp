@@ -53,7 +53,11 @@ const std::vector<ShortHollyhock>& ShortHollyhocksPosition::getShortHollyhocks()
 std::set<ShortHollyhocksPiece> ShortHollyhocksPosition::getPieces(Player player) const {
     std::set<ShortHollyhocksPiece> result;
     for (size_t index = 0; index < shortHollyhocks.size(); index++) {
-        addShortHollyhocksPiece(player, index, shortHollyhocks[index], result);
+        const ShortHollyhock shortHollyhock = shortHollyhocks[index];
+        if (player == Player::LEFT && (shortHollyhock == ShortHollyhock::BLUE_HALF || shortHollyhock == ShortHollyhock::RED_HALF || shortHollyhock == ShortHollyhock::BLUE_WHOLE))
+            result.insert(ShortHollyhocksPiece(index, PieceColour::BLUE));
+        else if (player == Player::RIGHT && (shortHollyhock == ShortHollyhock::BLUE_HALF || shortHollyhock == ShortHollyhock::RED_HALF || shortHollyhock == ShortHollyhock::RED_WHOLE))
+            result.insert(ShortHollyhocksPiece(index, PieceColour::RED));
     }
     return result;
 }

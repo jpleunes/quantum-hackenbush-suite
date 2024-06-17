@@ -105,3 +105,14 @@ void ShortHollyhocksPosition::printHumanReadable() const {
     std::cout << std::endl;
     std::cout << "==============================" << std::endl;
 }
+
+const ShortHollyhocksCounts ShortHollyhocksPosition::getCounts() const {
+    ShortHollyhocksCounts result;
+    for (ShortHollyhock shortHollyhock : shortHollyhocks) {
+        if (shortHollyhock == ShortHollyhock::BLUE_HALF) result.nBlueHalves++;
+        else if (shortHollyhock == ShortHollyhock::RED_HALF) result.nRedHalves++;
+        else if (shortHollyhock == ShortHollyhock::BLUE_WHOLE) result.nBlueWholes++;
+        else if (shortHollyhock == ShortHollyhock::RED_WHOLE) result.nRedWholes++;
+    }
+    return result;
+}

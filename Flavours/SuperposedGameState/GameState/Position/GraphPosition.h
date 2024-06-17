@@ -2,8 +2,9 @@
 #define GRAPH_POSITION_H
 
 #include "Position.h"
+#include "../../RealisationsUtil.h"
 
-class GraphPosition : public Position<Edge> {
+class GraphPosition : public Position<Edge, AdjacencyMatrixRealisations> {
 public:
     virtual void addPiece(Edge piece, PieceColour colour) = 0;
     virtual bool removePiece(Edge piece) = 0;
@@ -12,5 +13,8 @@ public:
 
     virtual ~GraphPosition() = default;
 };
+
+// Prevent recursive dependence
+#include "../../Realisations.h"
 
 #endif // GRAPH_POSITION_H

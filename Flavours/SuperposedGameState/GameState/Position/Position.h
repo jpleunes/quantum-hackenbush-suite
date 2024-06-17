@@ -38,9 +38,11 @@ struct ShortHollyhocksPiece {
     }
 };
 
-template<typename Piece>
+template<typename Piece, typename Realisations>
 class Position {
 public:
+    typedef Realisations RealisationsType;
+
     virtual bool removePiece(Piece piece) = 0;
     virtual std::set<Piece> getPieces(Player player) const = 0;
     

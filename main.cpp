@@ -6,17 +6,17 @@
 #include "Util/CreatePositionUtil.h"
 #include "Flavours/SuperposedGameStateClassical.h"
 #include "Flavours/SuperposedGameStateA.h"
-#include "Flavours/SuperposedGameStateB.h"
-#include "Flavours/SuperposedGameStateC.h"
-#include "Flavours/SuperposedGameStateCPrime.h"
-#include "Flavours/SuperposedGameStateD.h"
+// #include "Flavours/SuperposedGameStateB.h"
+// #include "Flavours/SuperposedGameStateC.h"
+// #include "Flavours/SuperposedGameStateCPrime.h"
+// #include "Flavours/SuperposedGameStateD.h"
 
 // By default, allow superposed moves of unbounded width
 size_t width = std::numeric_limits<size_t>::max();
 
 template<typename Flavour>
 ShortGameId gameStateIdToShortGameId(GameStateId gameStateId) {
-    Flavour startSuperposedGameState = SuperposedGameStateDatabase<Flavour>::getInstance().getOrInsert(gameStateId);
+    Flavour startSuperposedGameState = SuperposedGameStateDatabase<Flavour>::getInstance().getOrInsert(gameStateId, 0);
     return startSuperposedGameState.template determineShortGameId<Flavour>(width);
 }
 
@@ -25,10 +25,10 @@ void analyse(std::string function, GameStateId startGameState, std::string flavo
     ShortGameId shortGameId = -1;
     if (flavour == "classical") shortGameId = gameStateIdToShortGameId<SuperposedGameStateClassical<Realisation>>(startGameState);
     else if (flavour == "a") shortGameId = gameStateIdToShortGameId<SuperposedGameStateA<Realisation>>(startGameState);
-    else if (flavour == "b") shortGameId = gameStateIdToShortGameId<SuperposedGameStateB<Realisation>>(startGameState);
-    else if (flavour == "c") shortGameId = gameStateIdToShortGameId<SuperposedGameStateC<Realisation>>(startGameState);
-    else if (flavour == "cprime") shortGameId = gameStateIdToShortGameId<SuperposedGameStateCPrime<Realisation>>(startGameState);
-    else if (flavour == "d") shortGameId = gameStateIdToShortGameId<SuperposedGameStateD<Realisation>>(startGameState);
+    // else if (flavour == "b") shortGameId = gameStateIdToShortGameId<SuperposedGameStateB<Realisation>>(startGameState);
+    // else if (flavour == "c") shortGameId = gameStateIdToShortGameId<SuperposedGameStateC<Realisation>>(startGameState);
+    // else if (flavour == "cprime") shortGameId = gameStateIdToShortGameId<SuperposedGameStateCPrime<Realisation>>(startGameState);
+    // else if (flavour == "d") shortGameId = gameStateIdToShortGameId<SuperposedGameStateD<Realisation>>(startGameState);
     else throw(std::domain_error("Unknown flavour."));
 
     ShortGame& shortGame = ShortGameDatabase::getInstance().getGame(shortGameId);

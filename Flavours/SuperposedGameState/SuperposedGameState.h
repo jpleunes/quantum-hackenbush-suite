@@ -8,7 +8,6 @@
 
 #include "../../ShortGame/ShortGame.h"
 #include "GameState/GameStateDatabase.h"
-#include "../../Util/HashUtil.h"
 #include "Generator.h"
 #include "GameState/Position/ShortHollyhocksPosition.h"
 
@@ -28,15 +27,18 @@ struct SuperposedGameStateCache {
 template<typename Realisation>
 class SuperposedGameState {
 public:
+    typedef Realisation RealisationType;
+
     // This constructor should only be used from within SuperposedGameStateDatabase.
     // Otherwise, SuperposedGameStateDatabase.getOrInsert should be used.
-    SuperposedGameState(GameStateId classicalGameState, SuperposedGameStateId id);
+    SuperposedGameState(GameStateId classicalGameState, SuperposedGameStateId id, size_t depth);
     // This constructor should only be used from within SuperposedGameStateDatabase.
     // Otherwise, SuperposedGameStateDatabase.getOrInsert should be used.
-    SuperposedGameState(std::set<GameStateId> realisations, SuperposedGameStateId id);
+    SuperposedGameState(std::set<GameStateId> realisations, SuperposedGameStateId id, size_t depth);
 
     const std::set<GameStateId>& getRealisations() const { return realisations; }
     SuperposedGameStateId getId() const { return id; }
+    size_t getDepth() const { return depth; }
     // Checks whether two superposed game states have equal realisations sets.
     bool operator==(const SuperposedGameState<Realisation>& other) const {
         // Superposed game states with equal realisations sets are assigned the same id.
@@ -93,7 +95,7 @@ protected:
                     }
                 }
                 if (!option.empty()) {
-                    SuperposedGameStateId superposedGameStateId = SuperposedGameStateDatabase<Flavour>::getInstance().getOrInsert(option).getId();
+                    SuperposedGameStateId superposedGameStateId = SuperposedGameStateDatabase<Flavour>::getInstance().getOrInsert(option, depth + 1).getId();
                     result.emplace_back(superposedGameStateId);
                 }
             }
@@ -135,6 +137,7 @@ protected:
 private:
     const std::set<GameStateId> realisations;
     const SuperposedGameStateId id;
+    const size_t depth;
 
     /// @brief Gets all lexicographically strictly increasing vectors of indices ranging from 0 to n-1, of size w.
     /// @param n up to which value (exclusive) the indices should range
@@ -164,11 +167,11 @@ private:
 // This is a templated class, so the implementations need to go here
 
 template<typename Realisation>
-SuperposedGameState<Realisation>::SuperposedGameState(GameStateId classicalGameState, SuperposedGameStateId id) : realisations({classicalGameState}), id(id) {
+SuperposedGameState<Realisation>::SuperposedGameState(GameStateId classicalGameState, SuperposedGameStateId id, size_t depth) : realisations({classicalGameState}), id(id), depth(depth) {
 }
 
 template<typename Realisation>
-SuperposedGameState<Realisation>::SuperposedGameState(std::set<GameStateId> realisations, SuperposedGameStateId id) : realisations(realisations), id(id) {
+SuperposedGameState<Realisation>::SuperposedGameState(std::set<GameStateId> realisations, SuperposedGameStateId id, size_t depth) : realisations(realisations), id(id), depth(depth) {
     if (realisations.empty()) throw(std::domain_error("Cannot construct empty superposed game state."));
 }
 

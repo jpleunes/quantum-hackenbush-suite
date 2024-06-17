@@ -6,8 +6,8 @@
 template<typename Realisation>
 class SuperposedGameStateClassical : public SuperposedGameState<Realisation> {
 public:
-    SuperposedGameStateClassical(GameStateId classicalGameState, SuperposedGameStateId id);
-    SuperposedGameStateClassical(std::set<GameStateId> realisations, SuperposedGameStateId id);
+    SuperposedGameStateClassical(GameStateId classicalGameState, SuperposedGameStateId id, size_t depth);
+    SuperposedGameStateClassical(std::set<GameStateId> realisations, SuperposedGameStateId id, size_t depth);
     std::vector<SuperposedGameStateId> getOptions(Player player, size_t width) const override;
 
     ~SuperposedGameStateClassical() override = default;
@@ -16,11 +16,11 @@ public:
 // This is a templated class, so the implementations need to go here
 
 template<typename Realisation>
-SuperposedGameStateClassical<Realisation>::SuperposedGameStateClassical(GameStateId classicalGameState, SuperposedGameStateId id) : SuperposedGameState<Realisation>(classicalGameState, id) {
+SuperposedGameStateClassical<Realisation>::SuperposedGameStateClassical(GameStateId classicalGameState, SuperposedGameStateId id, size_t depth) : SuperposedGameState<Realisation>(classicalGameState, id, depth) {
 }
 
 template<typename Realisation>
-SuperposedGameStateClassical<Realisation>::SuperposedGameStateClassical(std::set<GameStateId> realisations, SuperposedGameStateId id) : SuperposedGameState<Realisation>(realisations, id) {
+SuperposedGameStateClassical<Realisation>::SuperposedGameStateClassical(std::set<GameStateId> realisations, SuperposedGameStateId id, size_t depth) : SuperposedGameState<Realisation>(realisations, id, depth) {
     if (realisations.size() > 1) throw(std::domain_error("Superposed game state of classical flavour should not contain more than one realisation."));
 }
 
@@ -34,7 +34,7 @@ std::vector<SuperposedGameStateId> SuperposedGameStateClassical<Realisation>::ge
     for (size_t i = 0; i < pieces.size(); i++) {
         GameState<Realisation>& gameState = GameStateDatabase<Realisation>::getInstance().getGameState(*this->getRealisations().begin());
         GameStateId newGameStateId = gameState.applyMove(pieces[i]).value();
-        SuperposedGameStateId superposedGameStateId = SuperposedGameStateDatabase<SuperposedGameStateClassical<Realisation>>::getInstance().getOrInsert(newGameStateId).getId();
+        SuperposedGameStateId superposedGameStateId = SuperposedGameStateDatabase<SuperposedGameStateClassical<Realisation>>::getInstance().getOrInsert(newGameStateId, this->getDepth() + 1).getId();
         result.emplace_back(superposedGameStateId);
     }
 

@@ -6,8 +6,8 @@
 template<typename Realisation>
 class SuperposedGameStateA : public SuperposedGameState<Realisation> {
 public:
-    SuperposedGameStateA(GameStateId classicalGameState, SuperposedGameStateId id);
-    SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id);
+    SuperposedGameStateA(GameStateId classicalGameState, SuperposedGameStateId id, size_t depth);
+    SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id, size_t depth);
     std::vector<SuperposedGameStateId> getOptions(Player player, size_t width) const override;
 
     ~SuperposedGameStateA() override = default;
@@ -16,16 +16,16 @@ public:
 // This is a templated class, so the implementations need to go here
 
 template<typename Realisation>
-SuperposedGameStateA<Realisation>::SuperposedGameStateA(GameStateId classicalGameState, SuperposedGameStateId id) : SuperposedGameState<Realisation>(classicalGameState, id) {
+SuperposedGameStateA<Realisation>::SuperposedGameStateA(GameStateId classicalGameState, SuperposedGameStateId id, size_t depth) : SuperposedGameState<Realisation>(classicalGameState, id, depth) {
 }
 
 template<typename Realisation>
-SuperposedGameStateA<Realisation>::SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id) : SuperposedGameState<Realisation>(realisations, id) {
+SuperposedGameStateA<Realisation>::SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id, size_t depth) : SuperposedGameState<Realisation>(realisations, id, depth) {
 }
 
 // For flavour A, if we are considering Short Hollyhocks positions, we can discard covered realisations
 template<>
-SuperposedGameStateA<ShortHollyhocksPosition>::SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id) : SuperposedGameState<ShortHollyhocksPosition>(determineNonCoveredRealisations(realisations), id) {   
+SuperposedGameStateA<ShortHollyhocksPosition>::SuperposedGameStateA(std::set<GameStateId> realisations, SuperposedGameStateId id, size_t depth) : SuperposedGameState<ShortHollyhocksPosition>(determineNonCoveredRealisations(realisations), id, depth) {   
 }
 
 template<typename Realisation>

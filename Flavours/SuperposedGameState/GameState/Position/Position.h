@@ -38,6 +38,8 @@ struct ShortHollyhocksPiece {
     }
 };
 
+typedef size_t HackenbushStringPiece;
+
 template<typename Piece>
 class Position {
 public:

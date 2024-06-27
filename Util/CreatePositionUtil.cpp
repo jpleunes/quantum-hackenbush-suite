@@ -61,3 +61,24 @@ const AdjacencyMatrixPosition createCircusTentAdjacencyMatrixPosition(size_t nLe
 
     return position;
 }
+
+const std::vector<HackenbushStringPosition> createHackenbushStringPositions(size_t length) {
+    if (length > sizeof(long) * CHAR_BIT) throw(std::domain_error("Length too great to construct Hackenbush strings."));
+    
+    std::vector<HackenbushStringPosition> result;
+
+    for (size_t i = 0; i < std::pow(2, length); i++) {
+        HackenbushStringPosition hackenbushStringPosition;
+
+        std::bitset<sizeof(long) * CHAR_BIT> bitString(i);
+        for (size_t j = 0; j < length; j++) {
+            bool bit = bitString[length - 1 - j];
+            if (bit) hackenbushStringPosition.addPiece(PieceColour::RED);
+            else hackenbushStringPosition.addPiece(PieceColour::BLUE);
+        }
+
+        result.emplace_back(hackenbushStringPosition);
+    }
+
+    return result;
+}

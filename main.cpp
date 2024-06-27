@@ -66,7 +66,7 @@ void analyse(std::string function, GameStateId startGameState, std::string flavo
 
 int main(int argc, char **argv) {
     if (argc < 4) {
-        std::cout << "Usage: qhs <function>[outcome,value,birthday] <position>[shortHollyhocks_<nBlueHalves>_<nRedHalves>_<nBlueWholes>_<nRedWholes>, circusTent_<nLegs>, file] <flavour>[classical,a,b,c,cprime,d] <max_width>(optional)" << std::endl;
+        std::cout << "Usage: qhs <function>[outcome,value,birthday] <position>[hackenbushString_<length>, shortHollyhocks_<nBlueHalves>_<nRedHalves>_<nBlueWholes>_<nRedWholes>, circusTent_<nLegs>, file] <flavour>[classical,a,b,c,cprime,d] <max_width>(optional)" << std::endl;
         return 1;
     }
     std::string function = argv[1];
@@ -82,7 +82,19 @@ int main(int argc, char **argv) {
     char delimiter = '_';
     while (getline(stream, part, delimiter)) parts.push_back(part);
 
-    if (parts[0] == "shortHollyhocks") {
+    if (parts[0] == "hackenbushString") {
+        if (parts.size() != 2) {
+            std::cout << "hackenbushString position should be formatted as hackenbushString_<length>" << std::endl;
+            return 1;
+        }
+        size_t length = std::stoi(parts[1]);
+
+        for (const HackenbushStringPosition& start : createHackenbushStringPositions(length)) {
+            GameStateId startGameState = GameStateDatabase<HackenbushStringPosition>::getInstance().getOrInsert(start).getId();
+            analyse<HackenbushStringPosition>(function, startGameState, flavour);
+        }
+    }
+    else if (parts[0] == "shortHollyhocks") {
         if (parts.size() != 5) {
             std::cout << "halvesWholes positon string should be formatted as shortHollyhocks_<nBlueHalves>_<nRedHalves>_<nBlueWholes>_<nRedWholes>" << std::endl;
             return 1;

@@ -40,14 +40,10 @@ void ShortHollyhocksPosition::addPiece(ShortHollyhocksPiece piece) {
                 shortHollyhocks[piece.index] = ShortHollyhock::BLUE_HALF;
                 return;
             }
-            throw(std::logic_error("Cannot add piece to Sort Hollyhocks position at given index."));
+            throw(std::logic_error("Cannot add piece to Short Hollyhocks position at given index."));
         default:
             throw(std::domain_error("Unsupported colour case."));
     }
-}
-
-const std::vector<ShortHollyhock>& ShortHollyhocksPosition::getShortHollyhocks() const {
-    return shortHollyhocks;
 }
 
 std::set<ShortHollyhocksPiece> ShortHollyhocksPosition::getPieces(Player player) const {
@@ -103,5 +99,5 @@ void ShortHollyhocksPosition::printHumanReadable() const {
         else std::cout << "NO ";
     }
     std::cout << std::endl;
-    std::cout << "==============================" << std::endl;
+    std::cout << "===================================" << std::endl;
 }

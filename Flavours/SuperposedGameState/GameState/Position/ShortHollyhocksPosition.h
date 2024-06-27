@@ -22,7 +22,6 @@ public:
 
     void addPiece(ShortHollyhocksPiece piece);
     bool removePiece(ShortHollyhocksPiece piece) override;
-    const std::vector<ShortHollyhock>& getShortHollyhocks() const;
     std::set<ShortHollyhocksPiece> getPieces(Player player) const override;
     void printHumanReadable() const override;
 

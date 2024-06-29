@@ -35,6 +35,7 @@ ShortGame& ShortGameDatabase::getOrInsert(long integer) {
             {},
             {},
             {},
+            {},
             OutcomeClass::L,
             {},
             {},
@@ -52,6 +53,7 @@ ShortGame& ShortGameDatabase::getOrInsert(long integer) {
         numberToId[DyadicRational(integer, 1)] = result.getId();
         
         result.setCache({
+            {},
             {},
             {},
             {},
@@ -87,6 +89,7 @@ ShortGame& ShortGameDatabase::getOrInsert(DyadicRational number) {
     if (simplifiedNumber.numerator > 0) outcomeClass = OutcomeClass::L;
     else if (simplifiedNumber.numerator < 0) outcomeClass = OutcomeClass::R;
     result.setCache({
+        {},
         {},
         {},
         {},

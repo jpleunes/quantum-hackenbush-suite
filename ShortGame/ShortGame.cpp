@@ -106,6 +106,32 @@ ShortGame& ShortGame::operator-(const ShortGame& other) const {
     return *this + (-other);
 }
 
+std::string ShortGame::determineDisplayString() const {
+    if (cache.displayString.has_value()) return cache.displayString.value();
+    std::ostringstream result;
+    std::optional<DyadicRational> numberValue = determineNumberValue();
+    if (numberValue.has_value()) {
+        result << numberValue.value();
+        cache.displayString = result.str();
+        return cache.displayString.value();
+    }
+    if (leftOptions.empty() && rightOptions.empty()) {
+        cache.displayString = "0";
+        return "0";
+    }
+    result << "{";
+    for (ShortGameId leftOption : leftOptions) {
+        result << ShortGameDatabase::getInstance().getGame(leftOption).determineDisplayString() << ",";
+    }
+    result << "|";
+    for (ShortGameId rightOption : rightOptions) {
+        result << ShortGameDatabase::getInstance().getGame(rightOption).determineDisplayString() << ",";
+    }
+    result << "}";
+    cache.displayString = result.str();
+    return cache.displayString.value();
+}
+
 OutcomeClass ShortGame::determineOutcomeClass(Player turn) const {
     if (turn == Player::LEFT && cache.leftStartOutcomeClass.has_value()) return cache.leftStartOutcomeClass.value();
     else if (turn == Player::RIGHT && cache.rightStartOutcomeClass.has_value()) return cache.rightStartOutcomeClass.value();

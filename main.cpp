@@ -55,7 +55,9 @@ void analyse(std::string function, GameStateId startGameState, std::string flavo
     else if (function == "value") {
         std::optional<DyadicRational> value = shortGame.determineNumberValue();
         if (value.has_value()) std::cout << value.value() << std::endl;
-        else std::cout << "NaN" << std::endl; // The value of the starting position is not a number
+        else { // The value of the starting position is not a number
+            std::cout << shortGame.determineCanonicalForm().determineDisplayString() << std::endl;
+        }
     }
     else if (function == "birthday") {
         size_t birthday = shortGame.determineBirthday();

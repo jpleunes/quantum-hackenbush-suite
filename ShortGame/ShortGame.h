@@ -21,7 +21,7 @@ struct ShortGameCache {
     std::unordered_map<ShortGameId, std::partial_ordering> comparison = {};
     std::optional<ShortGameId> negativeId;
     std::unordered_map<ShortGameId, ShortGameId> disjunctiveSum = {};
-    // TODO: displayString
+    std::optional<std::string> displayString;
     std::optional<OutcomeClass> outcomeClass, leftStartOutcomeClass, rightStartOutcomeClass;
     std::optional<size_t> birthday;
     std::optional<ShortGameId> canonicalFormId;
@@ -55,7 +55,8 @@ public:
     const std::set<ShortGameId>& getRightOptions() const { return rightOptions; }
     ShortGameId getId() const { return id; }
 
-    // TODO: getDisplayString
+    // Recursively constructs a display string representing this short game as a pair of sets of Left and Right options
+    std::string determineDisplayString() const;
     // Determines the outcome class of this game.
     OutcomeClass determineOutcomeClass() const;
     // Determines the birthday of this game.

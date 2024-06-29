@@ -1,4 +1,5 @@
 # Quantum Hackenbush Suite
+TODO: update README
 Tool that constructs game trees for restricted quantum hackenbush under different flavours.
 
 ## References

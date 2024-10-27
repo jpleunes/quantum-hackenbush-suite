@@ -5,6 +5,7 @@ Unsuperposed moves may also be allowed, with the quantum "flavour" defining exac
 
 This program was written by me (Jelle Pleunes) for a thesis named "Quantum Hackenbush", as part of the Computer Science master's programme at the Leiden Institute of Advanced Computer Science (LIACS), Leiden University.
 A reference to this thesis will be added once it is uploaded to the [LIACS Thesis Repository](https://theses.liacs.nl/cs).
+The slides for my final thesis presentation can be found [here](/doc/CS_Master_Thesis_Presentation.pdf).
 
 ## References
 An in-depth analysis of Hackenbush (and combinatorial games in general) can be found in the following paper by E. R. Berlekamp, J. H. Conway, and R. K. Guy:<br/>

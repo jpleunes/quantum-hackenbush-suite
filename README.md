@@ -1,7 +1,7 @@
 # Quantum Hackenbush Suite
 This is a program for analysing Quantum Hackenbush, which is a quantum-inspired variant of the combinatorial game Hackenbush.
 The program takes as an input a description of a Hackenbush position, and computes a property such as the birthday, outcome class, or value, in the case where superposed moves are allowed.
-Unsuperposed moves may also be allowed, with the quantum "flavour" defining exactly when they are allowed.
+Unsuperposed moves may also be allowed, with the quantum-inspired "flavour" defining exactly when they are allowed.
 
 This program was written by me (Jelle Pleunes) for a thesis named "Quantum-inspired Hackenbush", as part of the Computer Science master's programme at the Leiden Institute of Advanced Computer Science (LIACS), Leiden University.
 This thesis can be downloaded from the [LIACS Thesis Repository](https://theses.liacs.nl/3110).
